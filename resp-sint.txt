@@ -1,0 +1,3 @@
+Erro sintatico - Esperado símbolo ';' após a declaração da varável simples, vetor ou matriz - linha: 5
+Token problemático: tok209_=->5
+

@@ -1,0 +1,6 @@
+
+variaveis
+{
+	inteiro numero;
+
+}

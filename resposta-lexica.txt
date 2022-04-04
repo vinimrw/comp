@@ -1,0 +1,10 @@
+tok601_variaveis->2
+tok204_{->3
+tok613_inteiro->4
+tok500_numero->4
+tok200_;->4
+tok613_inteiro->5
+tok500_num->5
+tok209_=->5
+tok205_}->6
+$
