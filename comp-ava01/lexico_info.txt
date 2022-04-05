@@ -1,0 +1,58 @@
+###### Analisador Lexico  ######
+
+# Operador
+#   token100 - .
+#   token101 - +
+#   token102 - -
+#   token103 - *
+#   token104 - /
+#   token105 - ==
+#   token106 - !=
+#   token107 - >
+#   token108 - >=
+#   token109 - <
+#   token110 - <=
+#   token111 - = -token113
+
+# tok2 - Delimitador
+#   token200 - ;
+#   token201 - ,
+#   token202 - (
+#   token203 - )
+#   token204 - {
+#   token205 - }
+
+# Numero
+# token300 - Numero Inteiro
+# token301 - Numero Real
+
+# Id
+# token500 - Identificador
+
+# Palavra reservada
+#   token600 - main  
+#   token601 - var  
+#   token603 - func    
+#   token604 - return    
+#   token605 - void      
+#   token606 - if         
+#   token607 - else      
+#   token608 - while   
+#   token609 - print   
+#   token610 - int    
+#   token611 - bool  
+#   token612 - true 
+#   token613 - false      
+
+# tok700 - Cadeia constante seguidas entre ""
+
+
+# ========================== ERROS LEXICOS
+# Simbolo nao pertencente ao conjunto de simbolos terminais da linguagem
+# Identificador Mal formado
+# Tamanho do identificador
+# Numero mal formado
+# Fim de arquivo inesperado (comentario de bloco nao fechado)
+# Caractere ou string mal formados
+# ==============================================================================
+
