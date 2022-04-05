@@ -59,7 +59,7 @@ class AnalisadorSintatico():
     if("Erro Lexico" in self.tokens[self.i]):
       self.i += 1
 
-    self.variav = self.variable_decl()
+    self.var_tab = self.variable_decl()
     self.func_tab = self.func_decl()
     self.main_decl()
 
@@ -137,8 +137,8 @@ class AnalisadorSintatico():
         self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
         print('Token problematico: '+self.tokens[self.i])
         self.tem_erro_sintatico = True
-      self.arquivo_saida.write("Erro sintatico - Esperado as palavras reservadas 'inteiro' ou 'booleano' - linha: "+self.linha_atual+"\n")
-      print("Erro sintatico - Esperado as palavras reservadas 'inteiro' ou 'booleano' - linha: "+self.linha_atual+"\n")
+      self.arquivo_saida.write("Erro sintatico - Esperado as palavras reservadas 'int' ou 'bool' - linha: "+self.linha_atual+"\n")
+      print("Erro sintatico - Esperado as palavras reservadas 'int' ou 'bool' - linha: "+self.linha_atual+"\n")
       self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
       print('Token problematico: '+self.tokens[self.i])
       self.tem_erro_sintatico = True
@@ -246,16 +246,16 @@ class AnalisadorSintatico():
           while( not 'token602_func' in self.tokens[self.i] or "token600_main" in self.tokens[self.i]):
             self.next_token()
       else:
-        print("Erro sintatico - Esperado simbolo '{' apos a declaration de variaveis - linha: "+self.linha_atual+"\n")
-        self.arquivo_saida.write("Erro sintatico - Esperado simbolo '{' apos a declaration de variaveis - linha: "+self.linha_atual+"\n")
+        print("Erro sintatico - Esperado simbolo '{' apos a declaração de variaveis - linha: "+self.linha_atual+"\n")
+        self.arquivo_saida.write("Erro sintatico - Esperado simbolo '{' apos a declaração de variaveis - linha: "+self.linha_atual+"\n")
         print('Token problematico: '+self.tokens[self.i])
         self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
         self.tem_erro_sintatico = True
         while( not 'token602_func' in self.tokens[self.i] or "token600_main" in self.tokens[self.i]):
           self.next_token()
     else:
-      print("Erro sintatico - A declaration do bloco de variaveis, mesmo que vazio, eh obrigatoria nessa linguagem - linha: "+self.linha_atual+"\n")
-      self.arquivo_saida.write("Erro sintatico - A declaration do bloco de variaveis, mesmo que vazio, eh obrigatoria nessa linguagem - linha: "+self.linha_atual+"\n")
+      print("Erro sintatico - A declaração do bloco de variaveis, mesmo que vazio, eh obrigatoria nessa linguagem - linha: "+self.linha_atual+"\n")
+      self.arquivo_saida.write("Erro sintatico - A declaração do bloco de variaveis, mesmo que vazio, eh obrigatoria nessa linguagem - linha: "+self.linha_atual+"\n")
       print('Token problematico: '+self.tokens[self.i])
       self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
       self.tem_erro_sintatico = True
@@ -346,9 +346,9 @@ class AnalisadorSintatico():
         else:
           return variaveis_globais
       else:
-        print("Erro sintatico - Esperado simbolo ';' apos a declaration da varavel - linha: "+self.linha_atual+"\n")
+        print("Erro sintatico - Esperado simbolo ';' apos a declaração da varavel - linha: "+self.linha_atual+"\n")
         print('Token problematico: '+self.tokens[self.i])
-        self.arquivo_saida.write("Erro sintatico - Esperado simbolo ';' apos a declaration da varavel - linha: "+self.linha_atual+"\n")
+        self.arquivo_saida.write("Erro sintatico - Esperado simbolo ';' apos a declaração da varavel - linha: "+self.linha_atual+"\n")
         self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
         self.tem_erro_sintatico = True
         while( 
@@ -365,8 +365,8 @@ class AnalisadorSintatico():
         self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
         print('Token problematico: '+self.tokens[self.i])
         self.tem_erro_sintatico = True
-      self.arquivo_saida.write("Erro sintatico - Esperado as palavras reservadas 'inteiro' ou 'booleano' - linha: "+self.linha_atual+"\n")
-      print("Erro sintatico - Esperado as palavras reservadas 'inteiro' ou 'booleano' - linha: "+self.linha_atual+"\n")
+      self.arquivo_saida.write("Erro sintatico - Esperado as palavras reservadas 'int' ou 'bool' - linha: "+self.linha_atual+"\n")
+      print("Erro sintatico - Esperado as palavras reservadas 'int' ou 'bool' - linha: "+self.linha_atual+"\n")
       self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
       print('Token problematico: '+self.tokens[self.i])
       self.tem_erro_sintatico = True
@@ -498,27 +498,27 @@ class AnalisadorSintatico():
                   not 'token602_func' in self.tokens[self.i]):
                   self.next_token()
             else:
-              print("Erro sintatico - Esperado simbolo '{' apos o fechamento de parentesis da declaration de parametros da funcao - linha: "+self.linha_atual+"\n")
+              print("Erro sintatico - Esperado simbolo '{' apos o fechamento de parentesis da declaração de parametros da funcao - linha: "+self.linha_atual+"\n")
               print('Token problematico: '+self.tokens[self.i])
-              self.arquivo_saida.write("Erro sintatico - Esperado simbolo '{' apos o fechamento de parentesis da declaration de parametros da funcao - linha: "+self.linha_atual+"\n")
+              self.arquivo_saida.write("Erro sintatico - Esperado simbolo '{' apos o fechamento de parentesis da declaração de parametros da funcao - linha: "+self.linha_atual+"\n")
               self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
               self.tem_erro_sintatico = True
               while(not "token600_main" in self.tokens[self.i] or
               not 'token602_func' in self.tokens[self.i]):
                 self.next_token()
           else:
-            print("Erro sintatico - Esperado simbolo ')' ao final da declaration de parametros da funcao - linha: "+self.linha_atual+"\n")
+            print("Erro sintatico - Esperado simbolo ')' ao final da declaração de parametros da funcao - linha: "+self.linha_atual+"\n")
             print('Token problematico: '+self.tokens[self.i])
-            self.arquivo_saida.write("Erro sintatico - Esperado simbolo ')' ao final da declaration de parametros da funcao - linha: "+self.linha_atual+"\n")
+            self.arquivo_saida.write("Erro sintatico - Esperado simbolo ')' ao final da declaração de parametros da funcao - linha: "+self.linha_atual+"\n")
             self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
             self.tem_erro_sintatico = True
             while( not "token600_main" in self.tokens[self.i] or
             not 'token602_func' in self.tokens[self.i]):
               self.next_token()
         else:
-          print("Erro sintatico - Esperado simbolo '(' no início da declaration de parametros da funcao - linha: "+self.linha_atual+"\n")
+          print("Erro sintatico - Esperado simbolo '(' no início da declaração de parametros da funcao - linha: "+self.linha_atual+"\n")
           print('Token problematico: '+self.tokens[self.i])
-          self.arquivo_saida.write("Erro sintatico - Esperado simbolo '(' no início da declaration de parametros da funcao - linha: "+self.linha_atual+"\n")
+          self.arquivo_saida.write("Erro sintatico - Esperado simbolo '(' no início da declaração de parametros da funcao - linha: "+self.linha_atual+"\n")
           self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
           self.tem_erro_sintatico = True
           while("token600_main" in self.tokens[self.i] or
@@ -642,9 +642,9 @@ class AnalisadorSintatico():
 
         parametros += self.deriva_param()
     else:
-      print("Erro sintatico - Esperado tipo primitivo na declaration de parametros - linha: "+self.linha_atual+"\n")
+      print("Erro sintatico - Esperado tipo primitivo na declaração de parametros - linha: "+self.linha_atual+"\n")
       print('Token problematico: '+self.tokens[self.i])
-      self.arquivo_saida.write("Erro sintatico - Esperado tipo primitivo na declaration de parametros - linha: "+self.linha_atual+"\n")
+      self.arquivo_saida.write("Erro sintatico - Esperado tipo primitivo na declaração de parametros - linha: "+self.linha_atual+"\n")
       self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
       self.tem_erro_sintatico = True
       while(not 'token201_,' in self.tokens[self.i] or
@@ -698,9 +698,9 @@ class AnalisadorSintatico():
         if('token200_;' in self.tokens[self.i]):
           self.next_token()
         else:
-          print("Erro sintatico - Esperado simbolo ';' ao final da declaration de retorno da funcao - linha: "+self.linha_atual+"\n")
+          print("Erro sintatico - Esperado simbolo ';' ao final da declaração de retorno da funcao - linha: "+self.linha_atual+"\n")
           print('Token problematico: '+self.tokens[self.i])
-          self.arquivo_saida.write("Erro sintatico - Esperado simbolo ';' ao final da declaration de retorno da funcao - linha: "+self.linha_atual+"\n")
+          self.arquivo_saida.write("Erro sintatico - Esperado simbolo ';' ao final da declaração de retorno da funcao - linha: "+self.linha_atual+"\n")
           self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
           self.tem_erro_sintatico = True
           while(not 'token205_}' in self.tokens[self.i]):
@@ -1188,9 +1188,9 @@ class AnalisadorSintatico():
               self.i += 1
               self.else_decl()
             else:
-              print("Erro sintatico - Esperada simbolo '}'  para finalizar bloco de comando do 'se' - linha: "+self.linha_atual+"\n")
+              print("Erro sintatico - Esperada simbolo '}'  para finalizar bloco de comando do 'if' - linha: "+self.linha_atual+"\n")
               print('Token problematico: '+self.tokens[self.i])
-              self.arquivo_saida.write("Erro sintatico - Esperada simbolo '}'  para finalizar bloco de comando do 'se' - linha: "+self.linha_atual+"\n")
+              self.arquivo_saida.write("Erro sintatico - Esperada simbolo '}'  para finalizar bloco de comando do 'if' - linha: "+self.linha_atual+"\n")
               self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
               self.tem_erro_sintatico = True
               while(not 'token605_if' in self.tokens[self.i] or
@@ -1202,9 +1202,9 @@ class AnalisadorSintatico():
                 self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
         
           else:
-            print("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'se' - linha: "+self.linha_atual+"\n")
+            print("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'if' - linha: "+self.linha_atual+"\n")
             print('Token problematico: '+self.tokens[self.i])
-            self.arquivo_saida.write("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'se' - linha: "+self.linha_atual+"\n")
+            self.arquivo_saida.write("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'if' - linha: "+self.linha_atual+"\n")
             self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
             self.tem_erro_sintatico = True
             while(not 'token605_if' in self.tokens[self.i] or
@@ -1215,9 +1215,9 @@ class AnalisadorSintatico():
                 self.i += 1
                 self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
         else:
-          print("Erro sintatico - Esperada simbolo ')'  para finalizar a expressão do comando 'se' - linha: "+self.linha_atual+"\n")
+          print("Erro sintatico - Esperada simbolo ')'  para finalizar a expressão do comando 'if' - linha: "+self.linha_atual+"\n")
           print('Token problematico: '+self.tokens[self.i])
-          self.arquivo_saida.write("Erro sintatico - Esperada simbolo ')'  para finalizar a expressão do comando 'se' - linha: "+self.linha_atual+"\n")
+          self.arquivo_saida.write("Erro sintatico - Esperada simbolo ')'  para finalizar a expressão do comando 'if' - linha: "+self.linha_atual+"\n")
           self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
           self.tem_erro_sintatico = True
           while(not 'token605_if' in self.tokens[self.i] or
@@ -1242,9 +1242,9 @@ class AnalisadorSintatico():
             self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
         
     else:
-      print("Erro sintatico - Esperada comando 'se' - linha: "+self.linha_atual+"\n")
+      print("Erro sintatico - Esperada comando 'if' - linha: "+self.linha_atual+"\n")
       print('Token problematico: '+self.tokens[self.i])
-      self.arquivo_saida.write("Erro sintatico - Esperada comando 'se' - linha: "+self.linha_atual+"\n")
+      self.arquivo_saida.write("Erro sintatico - Esperada comando 'if' - linha: "+self.linha_atual+"\n")
       self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
       self.tem_erro_sintatico = True
       while(not 'token605_if' in self.tokens[self.i] or
@@ -1274,9 +1274,9 @@ class AnalisadorSintatico():
         if('token205_}' in self.tokens[self.i]):
           self.i += 1
         else:
-          print("Erro sintatico - Esperada simbolo '}'  para finalizar para finalizar o bloco de comando do 'senao' - linha: "+self.linha_atual+"\n")
+          print("Erro sintatico - Esperada simbolo '}'  para finalizar para finalizar o bloco de comando do 'else' - linha: "+self.linha_atual+"\n")
           print('Token problematico: '+self.tokens[self.i])
-          self.arquivo_saida.write("Erro sintatico - Esperada simbolo '}'  para finalizar para finalizar o bloco de comando do 'senao' - linha: "+self.linha_atual+"\n")
+          self.arquivo_saida.write("Erro sintatico - Esperada simbolo '}'  para finalizar para finalizar o bloco de comando do 'else' - linha: "+self.linha_atual+"\n")
           self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
           self.tem_erro_sintatico = True
           while(not 'token605_if' in self.tokens[self.i] or
@@ -1287,9 +1287,9 @@ class AnalisadorSintatico():
             self.i += 1
             self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
       else:
-        print("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'senao' - linha: "+self.linha_atual+"\n")
+        print("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'else' - linha: "+self.linha_atual+"\n")
         print('Token problematico: '+self.tokens[self.i])
-        self.arquivo_saida.write("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'senao' - linha: "+self.linha_atual+"\n")
+        self.arquivo_saida.write("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'else' - linha: "+self.linha_atual+"\n")
         self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
         self.tem_erro_sintatico = True
         while(not 'token605_if' in self.tokens[self.i] or
@@ -1300,9 +1300,9 @@ class AnalisadorSintatico():
             self.i += 1
             self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
     else:
-        print("Erro sintatico - Esperado o bloco de comando do 'senao' - linha: "+self.linha_atual+"\n")
+        print("Erro sintatico - Esperado o bloco de comando do 'else' - linha: "+self.linha_atual+"\n")
         print('Token problematico: '+self.tokens[self.i])
-        self.arquivo_saida.write("Erro sintatico - Esperado o bloco de comando do 'senao' - linha: "+self.linha_atual+"\n")
+        self.arquivo_saida.write("Erro sintatico - Esperado o bloco de comando do 'else' - linha: "+self.linha_atual+"\n")
         self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
         self.tem_erro_sintatico = True
         while(not 'token605_if' in self.tokens[self.i] or
@@ -1331,10 +1331,10 @@ class AnalisadorSintatico():
             if('token205_}' in self.tokens[self.i]):
               self.i += 1
             else:
-              print("Erro sintatico - Esperada simbolo '}'  para finalizar bloco de comando do 'enquanto' - linha: "+self.linha_atual+"\n")
+              print("Erro sintatico - Esperada simbolo '}'  para finalizar bloco de comando do 'while' - linha: "+self.linha_atual+"\n")
               print('Token problematico: '+self.tokens[self.i])
               self.tem_erro_sintatico = True
-              self.arquivo_saida.write("Erro sintatico - Esperada simbolo '}'  para finalizar bloco de comando do 'enquanto' - linha: "+self.linha_atual+"\n")
+              self.arquivo_saida.write("Erro sintatico - Esperada simbolo '}'  para finalizar bloco de comando do 'while' - linha: "+self.linha_atual+"\n")
               self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
               while(not 'token605_if' in self.tokens[self.i] or
          not 'token608_print' in self.tokens[self.i] or
@@ -1344,10 +1344,10 @@ class AnalisadorSintatico():
                 self.i += 1
                 self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
           else:
-            print("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'enquanto' - linha: "+self.linha_atual+"\n")
+            print("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'while' - linha: "+self.linha_atual+"\n")
             print('Token problematico: '+self.tokens[self.i])
             self.tem_erro_sintatico = True
-            self.arquivo_saida.write("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'enquanto' - linha: "+self.linha_atual+"\n")
+            self.arquivo_saida.write("Erro sintatico - Esperada simbolo '{'  para iniciar o bloco de comando do 'while' - linha: "+self.linha_atual+"\n")
             self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
             while(not 'token605_if' in self.tokens[self.i] or
          not 'token608_print' in self.tokens[self.i] or
@@ -1357,10 +1357,10 @@ class AnalisadorSintatico():
                 self.i += 1
                 self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
         else:
-          print("Erro sintatico - Esperada simbolo ')'  para finalizar a expressão do comando 'enquanto' - linha: "+self.linha_atual+"\n")
+          print("Erro sintatico - Esperada simbolo ')'  para finalizar a expressão do comando 'while' - linha: "+self.linha_atual+"\n")
           print('Token problematico: '+self.tokens[self.i])
           self.tem_erro_sintatico = True
-          self.arquivo_saida.write("Erro sintatico - Esperada simbolo ')'  para finalizar a expressão do comando 'enquanto' - linha: "+self.linha_atual+"\n")
+          self.arquivo_saida.write("Erro sintatico - Esperada simbolo ')'  para finalizar a expressão do comando 'while' - linha: "+self.linha_atual+"\n")
           self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
           while(not 'token605_if' in self.tokens[self.i] or
          not 'token608_print' in self.tokens[self.i] or
@@ -1384,9 +1384,9 @@ class AnalisadorSintatico():
                 self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
         
     else:
-      print("Erro sintatico - Esperada comando 'enquanto' - linha: "+self.linha_atual+"\n")
+      print("Erro sintatico - Esperada comando 'while' - linha: "+self.linha_atual+"\n")
       print('Token problematico: '+self.tokens[self.i])
-      self.arquivo_saida.write("Erro sintatico - Esperada comando 'enquanto' - linha: "+self.linha_atual+"\n")
+      self.arquivo_saida.write("Erro sintatico - Esperada comando 'while' - linha: "+self.linha_atual+"\n")
       self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
       self.tem_erro_sintatico = True
       while(not 'token605_if' in self.tokens[self.i] or
@@ -1434,9 +1434,9 @@ class AnalisadorSintatico():
                 self.i += 1
                 self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
         else:
-          print("Erro sintatico - Espera-se simbolo ')' ao final da declaration de parametros da chamada de funcao print - linha: "+self.linha_atual+"\n")
+          print("Erro sintatico - Espera-se simbolo ')' ao final da declaração de parametros da chamada de funcao print - linha: "+self.linha_atual+"\n")
           print('Token problematico: '+self.tokens[self.i])
-          self.arquivo_saida.write("Erro sintatico - Espera-se simbolo ')' ao final da declaration de parametros da chamada de funcao print - linha: "+self.linha_atual+"\n")
+          self.arquivo_saida.write("Erro sintatico - Espera-se simbolo ')' ao final da declaração de parametros da chamada de funcao print - linha: "+self.linha_atual+"\n")
           self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
           self.tem_erro_sintatico = True
           while(not 'token605_if' in self.tokens[self.i] or
@@ -1447,9 +1447,9 @@ class AnalisadorSintatico():
                 self.i += 1
                 self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
       else:
-        print("Erro sintatico - Espera-se simbolo '(' ao início da declaration de parametros da chamada de funcao print - linha: "+self.linha_atual+"\n")
+        print("Erro sintatico - Espera-se simbolo '(' ao início da declaração de parametros da chamada de funcao print - linha: "+self.linha_atual+"\n")
         print('Token problematico: '+self.tokens[self.i])
-        self.arquivo_saida.write("Erro sintatico - Espera-se simbolo '(' ao início da declaration de parametros da chamada de funcao print - linha: "+self.linha_atual+"\n")
+        self.arquivo_saida.write("Erro sintatico - Espera-se simbolo '(' ao início da declaração de parametros da chamada de funcao print - linha: "+self.linha_atual+"\n")
         self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
         self.tem_erro_sintatico = True
         while(not 'token605_if' in self.tokens[self.i] or
@@ -2114,18 +2114,18 @@ class AnalisadorSintatico():
           self.i += 1
           self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
         else:
-          print("Erro sintatico - Esperado '}' na declaration de main - linha: "+self.linha_atual+"\n")
+          print("Erro sintatico - Esperado '}' na declaração de main - linha: "+self.linha_atual+"\n")
           print('Token problematico: '+self.tokens[self.i])
-          self.arquivo_saida.write("Erro sintatico - Esperado '}' na declaration de main - linha: "+self.linha_atual+"\n")
+          self.arquivo_saida.write("Erro sintatico - Esperado '}' na declaração de main - linha: "+self.linha_atual+"\n")
           self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
           self.tem_erro_sintatico = True
           while(not "$" in self.tokens[self.i]):
             self.i += 1
             self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
       else:
-        print("Erro sintatico - Esperado '{' na declaration de main - linha: "+self.linha_atual+"\n")
+        print("Erro sintatico - Esperado '{' na declaração de main - linha: "+self.linha_atual+"\n")
         print('Token problematico: '+self.tokens[self.i])
-        self.arquivo_saida.write("Erro sintatico - Esperado '{' na declaration de main - linha: "+self.linha_atual+"\n")
+        self.arquivo_saida.write("Erro sintatico - Esperado '{' na declaração de main - linha: "+self.linha_atual+"\n")
         self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
         self.tem_erro_sintatico = True
         while(not "$" in self.tokens[self.i]):
