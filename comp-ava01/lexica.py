@@ -291,5 +291,3 @@ class AnalisadorLexico():
 
 # Executando o programa
 
-analisador_lexico = AnalisadorLexico()
-analisador_lexico.analisa()
