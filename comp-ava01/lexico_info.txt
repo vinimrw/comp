@@ -32,17 +32,19 @@
 # Palavra reservada
 #   token600 - main  
 #   token601 - var  
-#   token603 - func    
-#   token604 - return    
-#   token605 - void      
-#   token606 - if         
-#   token607 - else      
-#   token608 - while   
-#   token609 - print   
-#   token610 - int    
-#   token611 - bool  
-#   token612 - true 
-#   token613 - false      
+#   token602 - func    
+#   token603 - return    
+#   token604 - void      
+#   token605 - if         
+#   token606 - else      
+#   token607 - while   
+#   token608 - print   
+#   token609 - int    
+#   token610 - bool  
+#   token611 - true 
+#   token612 - false      
+#   token613 - break
+#   token614 - continue
 
 # tok700 - Cadeia constante seguidas entre ""
 

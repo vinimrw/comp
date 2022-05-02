@@ -689,7 +689,7 @@ class AnalisadorSintatico():
 
     if('token601_var' in self.tokens[self.i]):
       # dicionario que guarda as variaveis locais dessa funcao
-      variaveis_locais_func = self.variable_decl()
+      variaveis_locais_func = self.variable_decl() 
       # o conteudo da funcao possui inicialmente o dicionario de variaveis locais, que pode ser vazio caso nao existam
       self.commands_decl()
       if('token603_return' in self.tokens[self.i]):
@@ -751,8 +751,9 @@ class AnalisadorSintatico():
       self.next_token()
       self.id_param_aux()
     elif(
-      'token609_int' in self.tokens[self.i] or
-      'token610_bool' in self.tokens[self.i]):
+      'token300_' in self.tokens[self.i] or
+      'token611_true' in self.tokens[self.i] or
+      'token612_false' in self.tokens[self.i]):
         self.value_pri()
     else:
       print("Erro sintatico - Esperado o retorno da funcao - linha: "+self.linha_atual+"\n")
@@ -770,9 +771,11 @@ class AnalisadorSintatico():
     if('token603_return' in self.tokens[self.i] or
        'token205_}' in self.tokens[self.i]):
       return
-    elif( 'token605_if' in self.tokens[self.i] or
+    elif('token605_if' in self.tokens[self.i] or
         'token608_print' in self.tokens[self.i] or
         'token607_while' in self.tokens[self.i] or
+        'token613_break' in self.tokens[self.i] or
+        'token614_continue' in self.tokens[self.i] or
         'token500_' in self.tokens[self.i]):
       self.commands()
       self.commands_decl()
@@ -833,6 +836,9 @@ class AnalisadorSintatico():
       self.print_statement()
 #    elif( 'tok611_leia' in self.tokens[self.i] ):
 #      self.leia_declaracao()
+    elif ('token613_break' in self.tokens[self.i] or
+      'token614_continue' in self.tokens[self.i]):
+      self.break_continue()
     elif( 'token607_while' in self.tokens[self.i] ):
       self.while_loop()
 #    elif( 'tok610_para' in self.tokens[self.i] ):
@@ -1400,8 +1406,28 @@ class AnalisadorSintatico():
 
 
 
-  
-  
+  def break_continue(self):
+    if ("Erro Lexico" in self.tokens[self.i]):
+      self.i += 1
+    if ("token613_break" in self.tokens[self.i] or
+      "token614_continue" in self.tokens[self.i]):
+      self.i += 1
+      self.linha_atual = self.tokens[self.i][self.tokens[self.i].find('->')+2: -1]
+      if("token200_;" in self.tokens[self.i]):
+        self.i += 1
+        self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
+      else:
+        print("Erro sintatico - Espera-se simbolo ';' após um break ou um continue - linha: "+self.linha_atual+"\n")
+        print('Token problematico: '+self.tokens[self.i])
+        self.arquivo_saida.write("Erro sintatico - Espera-se simbolo ';' após um break ou um continue - linha: "+self.linha_atual+"\n")
+        self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
+        self.tem_erro_sintatico = True
+    else:
+      print("Erro sintatico - Espera-se um break ou um continue - linha: "+self.linha_atual+"\n")
+      print('Token problematico: '+self.tokens[self.i])
+      self.arquivo_saida.write("Erro sintatico - Espera-se um break ou um continue - linha: "+self.linha_atual+"\n")
+      self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
+      self.tem_erro_sintatico = True
   # <print_statement> := print (<print_syntax>);
 
   def print_statement(self):
@@ -1646,6 +1672,8 @@ class AnalisadorSintatico():
     #import pdb; pdb.set_trace() # Break do debbug
     if("token500_" in self.tokens[self.i] or
        "token300_" in self.tokens[self.i] or
+       "token611_true" in self.tokens[self.i] or
+       "token612_false" in self.tokens[self.i] or
        "token202_(" in self.tokens[self.i]):
       self.exp_boll()
       self.op_relacional()
@@ -1668,6 +1696,8 @@ class AnalisadorSintatico():
       self.i += 1
     if("token500_" in self.tokens[self.i] or
        "token300_" in self.tokens[self.i] or
+       "token611_true" in self.tokens[self.i] or
+       "token612_false" in self.tokens[self.i] or
        "token202_(" in self.tokens[self.i]):
         self.term()
         self.termo_syntax()
@@ -1838,7 +1868,11 @@ class AnalisadorSintatico():
   def term(self):
     if("Erro Lexico" in self.tokens[self.i]):
       self.i += 1
-    if('token500_' in self.tokens[self.i] or 'token300_' in self.tokens[self.i] or 'token202_(' in self.tokens[self.i]):
+    if('token500_' in self.tokens[self.i] or
+      'token300_' in self.tokens[self.i] or
+      "token611_true" in self.tokens[self.i] or
+      "token612_false" in self.tokens[self.i] or
+      'token202_(' in self.tokens[self.i]):
       self.fator()
       self.fator_deriva()
     else:
@@ -1900,6 +1934,10 @@ class AnalisadorSintatico():
       self.i += 1
       self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
       self.id_param_aux()
+    elif('token611_true' in self.tokens[self.i] or
+      'token612_false' in  self.tokens[self.i]):
+      self.i += 1
+      self.linha_atual = self.tokens[self.i][self.tokens[self.i].find('->')+2: -1]
     elif('token300_' in self.tokens[self.i]):
       self.i += 1
       self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]

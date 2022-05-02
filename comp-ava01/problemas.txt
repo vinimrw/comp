@@ -1,8 +1,8 @@
 - Santos 
-  - Break e continue ainda não são suportados.
+  - Break e continue ainda não são suportados. (Resolvido)
 
-  - Não está aceitando retornar constantes em funções, apenas variáveis. (Erro sintatico - Esperado o retorno da funcao - linha: 10, Token problematico: token611_true->10)
-  - Condicional com booleano não está sendo aceito. (Erro sintatico - Esperado uma variavel ou um numero ou '(' - linha: 10, Token problematico: token611_true->10)
+  - Não está aceitando retornar constantes em funções, apenas variáveis. (Erro sintatico - Esperado o retorno da funcao - linha: 10, Token problematico: token611_true->10) (Resolvido)
+  - Condicional com booleano não está sendo aceito. (Erro sintatico - Esperado uma variavel ou um numero ou '(' - linha: 10, Token problematico: token611_true->10) (Resolvido)
 
 
 - Martins
