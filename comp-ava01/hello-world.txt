@@ -1,7 +1,0 @@
-var {
-
-}
-
-main {
-  print("hello, world");
-}

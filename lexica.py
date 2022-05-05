@@ -80,14 +80,14 @@ class AnalisadorLexico():
 
   # Metodo que verifica se a entrada eh uma palavra reservada
   def ehReservada(self, entrada):
-    reservadas = "main var func return void if else while print int bool true false".split()
+    reservadas = "main var func return void if else while print int bool true false break continue".split()
     if entrada in reservadas:
       return True
     return False
 
   # Metodo que especifica qual dos tokens palavras reservadas eh a entrada
   def qualTokenReservada(self, entrada):
-    reservadas = '''main var func return void if else while print int bool true false'''.split()
+    reservadas = '''main var func return void if else while print int bool true false break continue'''.split()
     posicao = 0
     for x in reservadas:
       if x == entrada:
@@ -291,5 +291,3 @@ class AnalisadorLexico():
 
 # Executando o programa
 
-analisador_lexico = AnalisadorLexico()
-analisador_lexico.analisa()

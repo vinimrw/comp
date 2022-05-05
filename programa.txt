@@ -1,40 +1,21 @@
 var
 {
-	int numero;  
-	int num = 1098;
-	bool tru = true;
+
 }
-func void faznada()
+func bool faznada(int a, int b)
 {
-	var
+	var {
+		int a;
+		int x = 10;
+	}
+	a = 10;
+	if(a == true)
 	{
-		int a = 10;
+		a = 20;
 	}
-	if(a==b){
-		print("sucesso");
-	}
-	else{
-		print("sucesso");
-	}
-	print("sucesso");
-	return void;
+	return false;
 }
 main
 {
-	var
-	{
-		int aana = 10;
-	}
-	a = faznada();
-	
-	if (a < ( b + 3)){
-		a = 25;
-	}
-	a = 2+4;
-	while (x!=z){
-		print("sucesso");
-	}
-	
-	a = 25;
 	
 }
