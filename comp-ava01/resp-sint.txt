@@ -1,4 +1,0 @@
-Erro sintatico - Esperado declaracao de variveis ou declaracao de comandos - linha: 6
-Token problematico: token609_int->6
-
-Verifique os erros sintaticos e tente compilar novamente
