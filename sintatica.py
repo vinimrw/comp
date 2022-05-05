@@ -692,27 +692,27 @@ class AnalisadorSintatico():
       variaveis_locais_func = self.variable_decl() 
       # o conteudo da funcao possui inicialmente o dicionario de variaveis locais, que pode ser vazio caso nao existam
       self.commands_decl()
-      if('token603_return' in self.tokens[self.i]):
-        self.next_token()
-        self.return_deriva()
-        if('token200_;' in self.tokens[self.i]):
-          self.next_token()
-        else:
-          print("Erro sintatico - Esperado simbolo ';' ao final da declaração de retorno da funcao - linha: "+self.linha_atual+"\n")
-          print('Token problematico: '+self.tokens[self.i])
-          self.arquivo_saida.write("Erro sintatico - Esperado simbolo ';' ao final da declaração de retorno da funcao - linha: "+self.linha_atual+"\n")
-          self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
-          self.tem_erro_sintatico = True
-          while(not 'token205_}' in self.tokens[self.i]):
-            self.next_token()
-      else:
-        print("Erro sintatico - Esperada palavra reservada retorno para indicar que a funcao acabou e esta retornando algo ou vazio - linha: "+self.linha_atual+"\n")
-        print('Token problematico: '+self.tokens[self.i])
-        self.arquivo_saida.write("Erro sintatico - Esperada palavra reservada retorno para indicar que a funcao acabou e esta retornando algo ou vazio - linha: "+self.linha_atual+"\n")
-        self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
-        self.tem_erro_sintatico = True
-        while(not 'token205_}' in self.tokens[self.i]):
-          self.next_token()
+      # if('token603_return' in self.tokens[self.i]):
+      #   self.next_token()
+      #   self.return_deriva()
+      #   if('token200_;' in self.tokens[self.i]):
+      #     self.next_token()
+      #   else:
+      #     print("Erro sintatico - Esperado simbolo ';' ao final da declaração de retorno da funcao - linha: "+self.linha_atual+"\n")
+      #     print('Token problematico: '+self.tokens[self.i])
+      #     self.arquivo_saida.write("Erro sintatico - Esperado simbolo ';' ao final da declaração de retorno da funcao - linha: "+self.linha_atual+"\n")
+      #     self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
+      #     self.tem_erro_sintatico = True
+      #     while(not 'token205_}' in self.tokens[self.i]):
+      #       self.next_token()
+      # else:
+      #   print("Erro sintatico - Esperada palavra reservada retorno para indicar que a funcao acabou e esta retornando algo ou vazio - linha: "+self.linha_atual+"\n")
+      #   print('Token problematico: '+self.tokens[self.i])
+      #   self.arquivo_saida.write("Erro sintatico - Esperada palavra reservada retorno para indicar que a funcao acabou e esta retornando algo ou vazio - linha: "+self.linha_atual+"\n")
+      #   self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
+      #   self.tem_erro_sintatico = True
+      #   while(not 'token205_}' in self.tokens[self.i]):
+      #     self.next_token()
     elif( 'token605_if' in self.tokens[self.i] or
         'token608_print' in self.tokens[self.i] or
         'token607_while' in self.tokens[self.i] or
@@ -769,9 +769,19 @@ class AnalisadorSintatico():
   def commands_decl(self):
     if("Erro Lexico" in self.tokens[self.i]):
       self.i += 1
-    if('token603_return' in self.tokens[self.i] or
-       'token205_}' in self.tokens[self.i]):
+    if('token205_}' in self.tokens[self.i]):
       return
+    elif ('token603_return' in self.tokens[self.i]):
+      self.next_token()
+      self.return_deriva()
+      if('token200_;' in self.tokens[self.i]):
+          self.next_token()
+      else:
+          print("Erro sintatico - Esperado simbolo ';' ao final da declaração de retorno da funcao - linha: "+self.linha_atual+"\n")
+          print('Token problematico: '+self.tokens[self.i])
+          self.arquivo_saida.write("Erro sintatico - Esperado simbolo ';' ao final da declaração de retorno da funcao - linha: "+self.linha_atual+"\n")
+          self.arquivo_saida.write('Token problematico: '+self.tokens[self.i]+'\n')
+          self.tem_erro_sintatico = True
     elif('token605_if' in self.tokens[self.i] or
         'token608_print' in self.tokens[self.i] or
         'token607_while' in self.tokens[self.i] or
@@ -926,9 +936,12 @@ class AnalisadorSintatico():
       self.i += 1
     if('token500_' in self.tokens[self.i]):
       self.call_func()
+      self.simple_exp()
     elif('token202_(' in self.tokens[self.i] or
          'token101_+' in self.tokens[self.i] or
          'token102_-' in self.tokens[self.i] or
+         'token102_*' in self.tokens[self.i] or
+         'token102_/' in self.tokens[self.i] or
          'token500_' in self.tokens[self.i] or
          'token300_' in self.tokens[self.i]):
       self.simple_exp()
@@ -966,6 +979,12 @@ class AnalisadorSintatico():
           while(not 'token200_;' in self.tokens[self.i]):
             self.i += 1
             self.linha_atual = self.tokens[self.i][ self.tokens[self.i].find('->')+2: -1]
+      elif ('token200_;' in self.tokens[self.i] or
+         'token101_+' in self.tokens[self.i] or
+         'token102_-' in self.tokens[self.i] or
+         'token103_*' in self.tokens[self.i] or
+         'token104_/' in self.tokens[self.i]):
+         return
       else:
         print("Erro sintatico - Esperada simbolo '(' para finalizar bloco de comando <call_func> - linha: "+self.linha_atual+"\n")
         print('Token problematico: '+self.tokens[self.i])
