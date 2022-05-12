@@ -1,0 +1,11 @@
+program {
+
+    int b = 10;
+    int a = 0;
+    int c = 0;
+    if(b == 10){
+        b = 1;
+        a = 2;
+        c = 3;
+    } endif
+ } end
