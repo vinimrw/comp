@@ -6,12 +6,13 @@ func bool faznada(int a, int b)
 {
 	var {
 		int a;
-		int x = 10;
+		int x;
 	}
-	a = 10;
+	a = soma(a, b) + 10 + 5 * 2 / b;
 	if(a == true)
 	{
 		a = 20;
+		return true;
 	}
 	return false;
 }
