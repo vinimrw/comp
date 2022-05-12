@@ -1,22 +1,10 @@
-var
-{
+main {
 
-}
-func bool faznada(int a, int b)
-{
-	var {
-		int a;
-		int x;
-	}
-	a = soma(a, b) + 10 + 5 * 2 / b;
-	if(a == true)
-	{
-		a = 20;
-		return true;
-	}
-	return false;
-}
-main
-{
-	
-}
+    int b = 10;
+    int a = 0;
+    bool d = True;
+    if(b == 10){
+        b = 1;
+        a = 2;
+    } endif
+ } end

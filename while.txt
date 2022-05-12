@@ -1,0 +1,11 @@
+main {
+  int a = 0 + 2;
+  int b = 2;
+  while (a < 10){
+    a = 2;
+    continue;
+    if(b == 3){
+      break;
+    } endif
+  }endwhile
+} end

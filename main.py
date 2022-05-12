@@ -1,9 +1,36 @@
-from lexica import AnalisadorLexico
-from sintatica import AnalisadorSintatico
+from lexer.lexica import Scanner
+from parser_compiler.parser import Parser
+from pprint import pprint
 
+import sys
 
-analisador_lexico = AnalisadorLexico()
-analisador_lexico.analisa()
+if __name__ == "__main__":
+    caminho = "while.txt"
 
-sintatico = AnalisadorSintatico()
-sintatico.syntax()
+    try:
+        arquivo = open(caminho, "r")
+        programa = "".join(arquivo.readlines())
+        arquivo.close()
+    except Exception:
+        print("Error: caminho não informado")
+        sys.exit(1)
+
+    lexer = Scanner(programa)
+
+    tabelaDeTokens = lexer.scan()
+
+    parser = Parser(tabelaDeTokens)
+
+    # print("\nTABELA DE TOKENS:\n")
+    # for i in tabelaDeTokens:
+    #     print(i)
+
+    try:
+        parser.start()
+        print("\nTABELA DE SÍMBOLOS:")
+        pprint(parser.tabelaDeSimbolos)
+    except Exception as e:
+        print(e)
+
+else:
+    print("me executou como um módulo")
