@@ -1,0 +1,120 @@
+oq aprendi da linguagem 
+====
+tudo deve ser feito dentro do main
+variavel func proc if while...
+====
+variavel sempre tem que ser declarado
+  int b = 3;
+  bool baba = True;
+  int b; => x
+  bool baba; => x
+====
+escopo da funcao
+
+  func bool a(int b, int c){
+    return True;
+  };
+
+o ; no final para reconhecer o fim da funcao 
+deve ser declarada dentro do main
+parametros estao como obrigatorios 
+nao aceita retornos de variavel
+
+nao funciona 
+int a = 10;
+a = call func b(x,z);
+deve ser int a = call func b(x,z);
+return a; => return 20; return True;
+
+PEGANDO
+Erro Semântico: quantidade de parametros inválida na chamada
+variável não declarada nos parametros durante a chamada
+variavel chamando a funcao nao recebe valor de acordo com o tipo do retorno int chamando func bool
+===
+proc
+
+  proc p1(){
+    print(True);
+  };
+
+  call proc p1();
+
+nao esta aceitando parametros;
+===
+
+if-else
+
+  if(v == 2){
+    print(z);
+  } endif
+  else{
+     print(L);
+  }endelse
+
+dentro do if uma variavel bool so pode ser comparada a uma outra variavel bool 
+ex 
+bool a = True;
+bool b = False;
+if a == True 	-x
+if a == b 	check
+
+===
+while
+  int a = 0;
+  while (a < 10){
+    print(a);
+  }endwhile
+
+if dentro de while continue e break;
+
+main {
+  int a = 0;
+  int b = 2;
+  while (a < 10){
+    continue;
+    if(b == 3){
+      break;
+    } endif
+  }endwhile
+} end
+
+===
+
+
+TO DO 
+
+declaration_func_statement
+# TODO: (5 - falta descobrir) resolver exceção
+
+declaration_proc_statement
+# BLOCK # TODO: Verificar
+# TODO: (5 - falta descobrir) resolver exceção
+# BLOCK # TODO: Verificar
+
+print_statement
+# TODO: (4) SOLVE BUG DE CONTAGEM DE LINHAS
+
+declaration_var_semantico
+# TODO: Não finalizado (faltam expressões e funções)
+# TODO: Caso se 'int b = all func a();' se o return de func for Int
+# TODO: Verificar se as variáveis passadas na chamada, já foram declaradas
+# TODO: Fazer semantico caso int e = a + d;' int f = 1 + 2;' (Expressão aritmética)
+# TODO: Verificar se as variáveis passadas na chamada, já foram declaradas
+
+call_var_semantico
+# TODO: Não finalizado (faltam expressões e funções)
+# TODO: Resolver problema de escopo antigo sendo visivel
+
+buscarParamsProc
+# TODO: verificar posteriormente
+
+buscarParamsFunc
+# TODO: verificar posteriormente
+
+verificarTipoCallVar
+# TODO: Faltam expressões e funções
+
+declaration_func_semantico
+# TODO:  Faltam variaveis e funções
+
+
