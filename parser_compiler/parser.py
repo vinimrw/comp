@@ -92,7 +92,7 @@ class Parser:
         #    pprint(linha)
         #print('\n')
 
-        self.checkSemantica()
+        # self.checkSemantica()
         return
 
     def statement_list(self):
@@ -249,13 +249,14 @@ class Parser:
             return temp
 
 
-        if self.tokenAtual().tipo == "token500_Id":
+        if self.tokenAtual().tipo == "token500_Id": # Tratar aqui assim como é tratado quando ele acha Int ou bool
             temp = []
             temp.append(self.indexEscopoAtual)
             temp.append(self.tokenAtual().linha)
             temp.append(self.tokenAtual().tipo)
-            temp.append(self.tokenAtual().lexema)
-            self.call_var_statement(temp)
+            # temp.append(self.tokenAtual().lexema)
+            self.declaration_var_statement(temp, True)
+            # self.call_var_statement(temp)
             return temp
 
         else:
@@ -467,12 +468,13 @@ class Parser:
                 str(self.tokenAtual().linha)
             )
 
-    def declaration_var_statement(self, temp):
-        self.indexDaTabelaDeTokens += 1
+    def declaration_var_statement(self, temp, is_attribution = False):
+        if not is_attribution:
+            self.indexDaTabelaDeTokens += 1
         if self.tokenAtual().tipo == "token500_Id":
             temp.append(self.tokenAtual().lexema)
             self.indexDaTabelaDeTokens += 1
-            if self.tokenAtual().tipo == "token111_=":  
+            if self.tokenAtual().tipo == "token111_=" and is_attribution:  # Tratar aqui para não permitir ou permitir atribuicao na declaracao
                 temp.append(self.tokenAtual().lexema)
                 self.indexDaTabelaDeTokens += 1
                 tempEndVar = []
@@ -487,9 +489,12 @@ class Parser:
                         "Erro sintatico: falta do ponto e virgula na linha "
                         + str(self.tokenAtual().linha)
                     )
+            elif self.tokenAtual().tipo == "token200_;":
+                self.indexDaTabelaDeTokens += 1
+                self.tabelaDeSimbolos.append(temp)
             else:
                 raise Exception(
-                    "Erro sintatico: falta da atribuição na linha "
+                    "Erro sintatico: atribuição não é permitida em declaração "
                     + str(self.tokenAtual().linha)
                 )
 
@@ -578,7 +583,7 @@ class Parser:
             ):
                 temp.append(self.tokenAtual().lexema)
                 self.indexDaTabelaDeTokens += 1
-                if self.tokenAtual().tipo == "token200_;":
+                if self.tokenAtual().tipo == "token200_;": # Adicionar operação aritmetica aqui
                     self.indexDaTabelaDeTokens += 1
                     self.tabelaDeSimbolos.append(temp)
                 else:
@@ -811,22 +816,22 @@ class Parser:
                             temp.append(tempParenteses)
                             self.indexDaTabelaDeTokens += 1
 
-                            exit(0)
+                            # exit(0)
 
-                            nomeDaFuncao = temp[4]
-                            paramsDaFuncao = temp[5]
+                            # nomeDaFuncao = temp[4]
+                            # paramsDaFuncao = temp[5]
 
-                            self.tabelaDeTresEnderecos.append(
-                                ('label', nomeDaFuncao, 'null'))
+                            # self.tabelaDeTresEnderecos.append(
+                            #     ('label', nomeDaFuncao, 'null'))
 
-                            for param in paramsDaFuncao:
-                                self.tabelaDeTresEnderecos.append(
-                                    ('pop', param[2], 'null'))
+                            # for param in paramsDaFuncao:
+                            #     self.tabelaDeTresEnderecos.append(
+                            #         ('pop', param[2], 'null'))
 
-                            self.tabelaDeTresEnderecos.append(
-                                ('push', self.tempTresEnderecos, 'null'))
-                            self.tabelaDeTresEnderecos.append(
-                                ('ret', 'null', 'null'))
+                            # self.tabelaDeTresEnderecos.append(
+                            #     ('push', self.tempTresEnderecos, 'null'))
+                            # self.tabelaDeTresEnderecos.append(
+                            #     ('ret', 'null', 'null'))
 
                             if self.tokenAtual().tipo == "token204_{":
                                 self.indexEscopoAntesDaFuncao = self.indexEscopoAtual
@@ -1237,6 +1242,7 @@ class Parser:
                     self.tokenAtual().tipo == "token500_Id"
                     or self.tokenAtual().lexema == "True"
                     or self.tokenAtual().lexema == "False"
+                    or self.tokenAtual().tipo == "token300_Num"
                 ):
                     tempParams.append(self.tokenAtual().lexema)
                     self.indexDaTabelaDeTokens += 1
@@ -1291,6 +1297,7 @@ class Parser:
             self.tokenAtual().tipo == "token500_Id"
             or self.tokenAtual().lexema == "True"
             or self.tokenAtual().lexema == "False"
+            or self.tokenAtual().tipo == "token300_Num"
         ):
             tempParams.append(self.tokenAtual().lexema)
             self.indexDaTabelaDeTokens += 1
@@ -1300,6 +1307,7 @@ class Parser:
                 self.tokenAtual().tipo == "token500_Id"
                 or self.tokenAtual().lexema == "True"
                 or self.tokenAtual().lexema == "False"
+                or self.tokenAtual().tipo == "token300_Num"
             ):
                 raise Exception(
                     "Erro sintatico: falta vírgula na linha "

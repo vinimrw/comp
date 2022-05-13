@@ -5,7 +5,7 @@ from pprint import pprint
 import sys
 
 if __name__ == "__main__":
-    caminho = "while.txt"
+    caminho = "teste1.txt"
 
     try:
         arquivo = open(caminho, "r")
