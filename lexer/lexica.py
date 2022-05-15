@@ -92,8 +92,10 @@ class Scanner:
                 )
 
             else:
-                print("Caractere inválido na linha ", self.linha)
-                exit(2)
+                raise Exception(
+                    f"Erro léxico: Caractere {char} inválido na linha "
+                    + str(self.linha)
+                )
 
     def delimitadoresToken(self, char):
         

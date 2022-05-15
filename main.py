@@ -1,3 +1,4 @@
+import traceback
 from lexer.lexica import Scanner
 from parser_compiler.parser import Parser
 from pprint import pprint
@@ -27,9 +28,10 @@ if __name__ == "__main__":
 
     try:
         parser.start()
-        print("\nTABELA DE SÍMBOLOS:")
-        pprint(parser.tabelaDeSimbolos)
+        # print("\nTABELA DE SÍMBOLOS:")
+        # pprint(parser.tabelaDeSimbolos)
     except Exception as e:
+        traceback.print_exc()
         print(e)
 
 else:

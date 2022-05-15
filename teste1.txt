@@ -1,0 +1,38 @@
+main {
+  func int soma(int a, int b) {
+    int c;
+    c = b;
+    return c;
+  };
+
+  proc somaRef(int a, int b, int result) {
+    result = a + b;
+  };
+
+  int a;
+  int b;
+  b = 3;
+  a = call soma(1, 1);
+  call somaRef(1, 2, b);
+  int e;
+  if (a == 3) {
+    b = a;
+    if (b == 3) {
+      b = 1;
+    } endif
+    b = 2;
+  } endif
+
+  int i;
+  i = 10;
+  while (i > 0) {
+    if (i == 5) {
+      break;
+    } endif
+
+    break;
+    if (i == 6) {
+      continue;
+    } endif
+  } endwhile
+} end
