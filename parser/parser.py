@@ -1,7 +1,7 @@
 from pprint import pprint
 from lexemas import LEX_DIFERENTE, LEX_DIV, LEX_FALSE, LEX_IGUAL, LEX_MAIOR, LEX_MAIORIGUAL, LEX_MENOR, LEX_MENORIGUAL, LEX_MULT, LEX_SOMA, LEX_SUB, LEX_TRUE
 
-from tokens import TOKEN_ABRE_PARENTESES, TOKEN_BOOL, TOKEN_BREAK, TOKEN_CALL, TOKEN_CONTINUE, TOKEN_DIFERENTE, TOKEN_DIV, TOKEN_FECHA_CHAVES, TOKEN_FECHA_PARENTESES, TOKEN_ID, TOKEN_IGUAL, TOKEN_INT, TOKEN_MAIOR, TOKEN_MAIORIGUAL, TOKEN_MENOR, TOKEN_MENORIGUAL, TOKEN_MULT, TOKEN_NUM, TOKEN_PONTOVIRGULA, TOKEN_PROC, TOKEN_SOMA, TOKEN_SUB, TOKEN_TRUEFALSE, TOKEN_WHILE
+from tokens import TOKEN_ABRE_PARENTESES, TOKEN_BOOL, TOKEN_BREAK, TOKEN_CALL, TOKEN_CONTINUE, TOKEN_DIFERENTE, TOKEN_DIV, TOKEN_ELSE, TOKEN_FECHA_CHAVES, TOKEN_FECHA_PARENTESES, TOKEN_FUNC, TOKEN_ID, TOKEN_IF, TOKEN_IGUAL, TOKEN_INT, TOKEN_MAIOR, TOKEN_MAIORIGUAL, TOKEN_MENOR, TOKEN_MENORIGUAL, TOKEN_MULT, TOKEN_NUM, TOKEN_PONTOVIRGULA, TOKEN_PRINT, TOKEN_PROC, TOKEN_SOMA, TOKEN_SUB, TOKEN_TRUEFALSE, TOKEN_WHILE
 
 
 class Parser:
@@ -34,7 +34,7 @@ class Parser:
         #   pprint(linha)
         #print('\n')
 
-        self.checkSemantica()
+        self.check_semantica()
         return
 
     def escopo(self):
@@ -146,24 +146,9 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            if is_while:
-                self.if_escopo_While(temp, is_proc)
-
-                condicao = temp[3]
-                params = ''
-                for param in condicao:
-                    params += param + ", "
-                params = params[:-2]  
-                self.tabelaDeTresEnderecos.append("temp"+str(self.tempAtualTresEnd)+" := "+params)
-                self.tabelaDeTresEnderecos.append("if false temp"+str(self.tempAtualTresEnd)+" go to fimIf"+str(self.tempAtualIfTresEnd))
-                self.tabelaDeTresEnderecos.append("fimIf"+str(self.tempAtualIfTresEnd)+":")
-                self.tempAtualTresEnd += 1
-                self.tempAtualIfTresEnd += 1
-                return temp
-            else:
-                self.if_escopo_main(temp)
-                self.salvar_if_tres_enderecos(temp)
-                return temp
+            self.if_escopo_main(temp)
+            self.salvar_if_tres_enderecos(temp)
+            return temp
 
 
         if self.token_atual().tipo == "token607_while":
@@ -192,7 +177,7 @@ class Parser:
             )
 
     # o bloco que contém break/continue que só pode ser chamado dentro de um while
-    def block_escopo_while(self, context = True):
+    def block_escopo_while(self, context = True, is_while = True):
 
         if self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool":
             temp = []
@@ -258,7 +243,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.if_escopo_main_flow(temp, context)
+            self.if_escopo_main_flow(temp, context, is_while=True)
             return temp
 
 
@@ -288,7 +273,7 @@ class Parser:
             return temp
 
  
-        if self.token_atual().tipo == "token613_break" or self.token_atual().tipo == "token614_cont":
+        if is_while and self.token_atual().tipo == "token613_break" or self.token_atual().tipo == "token614_cont":
             temp = []
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
@@ -302,7 +287,7 @@ class Parser:
             )
 
     # é o que só pode ser chamado dentro de um if
-    def block_escopo_if(self, context=False):
+    def block_escopo_if(self, context=False, is_while=False):
 
         if self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool":
             temp = []
@@ -392,7 +377,15 @@ class Parser:
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
             temp.append(self.token_atual().lexema)
-            self.call_var_escopo_main(temp, context=True)
+            self.call_var_escopo_main(temp)
+            return temp
+
+        if is_while and (self.token_atual().tipo == "token613_break" or self.token_atual().tipo == "token614_cont"):
+            temp = []
+            temp.append(self.indexEscopoAtual)
+            temp.append(self.token_atual().linha)
+            temp.append(self.token_atual().tipo)
+            self.statement_flow()
             return temp
 
         else:
@@ -670,7 +663,7 @@ class Parser:
                  self.tabelaDeTresEnderecos.append(
                     f'goto temp{while_name}'
                 )
-            else:
+            elif (i[2] == TOKEN_IF):
                 self.tempAtualTresEnd += 1
                 self.salvar_if_tres_enderecos(i, is_while=True, whilename=while_name, endwhilename=endwhile_name)
 
@@ -696,7 +689,7 @@ class Parser:
     def salvar_if_tres_enderecos(self, dados, is_while=False, whilename=False, endwhilename = False):
         self.tabelaDeTresEnderecos.append((
             f'temp{self.tempAtualTresEnd}: if {dados[3][0]} {self.inverter_relacional(dados[3][1])} {dados[3][2]}'
-            + f' goto temp{self.tempAtualTresEnd+1}'
+            + f' goto temp{self.tempAtualTresEnd+2 if (len(dados) == 7 and dados[6][1] == TOKEN_ELSE) else self.tempAtualTresEnd+1 }'
         ))
         self.tempAtualTresEnd += 1
 
@@ -716,14 +709,49 @@ class Parser:
                  self.tabelaDeTresEnderecos.append(
                     f'goto temp{whilename}'
                 )
-            else:
+            elif i[2] == TOKEN_IF:
                 self.tempAtualTresEnd += 1
                 self.salvar_if_tres_enderecos(i)
+        
+        if (len(dados) == 7
+            and  dados[6][1] == TOKEN_ELSE
+        ):
+            self.tabelaDeTresEnderecos.append(
+                f'goto temp{if_name}'
+            )
+            self.tempAtualTresEnd += 1
+            self.salvar_else_tres_enderecos(dados[6])
 
         self.tabelaDeTresEnderecos.append(
             f'temp{if_name}:'
         )
         self.tempAtualTresEnd += 1
+
+    def salvar_else_tres_enderecos(self, dados, is_while=False, whilename=False, endwhilename = False):
+        self.tabelaDeTresEnderecos.append((
+            f'temp{self.tempAtualTresEnd}:'
+        ))
+        self.tempAtualTresEnd += 1
+
+        if_name = self.tempAtualTresEnd
+        for i in dados[2]:
+            if (i[2] == TOKEN_ID
+                or i[2] == TOKEN_TRUEFALSE
+                or i[2] == TOKEN_NUM):
+                self.salvar_variaveis_tres_endereco(i)
+            elif (i[2] == TOKEN_WHILE):
+                self.salvar_while_tres_enderecos(i)
+            elif (is_while and i[2] == TOKEN_BREAK):
+                self.tabelaDeTresEnderecos.append(
+                    f'goto temp{endwhilename}'
+                )
+            elif (is_while and i[2] == TOKEN_CONTINUE):
+                 self.tabelaDeTresEnderecos.append(
+                    f'goto temp{whilename}'
+                )
+            elif i[2] == TOKEN_IF:
+                self.tempAtualTresEnd += 1
+                self.salvar_if_tres_enderecos(i)
 
     def salvar_variaveis_tres_endereco(self, dados):
         if(len(dados[5]) > 1):
@@ -822,27 +850,18 @@ class Parser:
         if self.token_atual().tipo == "token111_=":  
             temp.append(self.token_atual().lexema)
             self.indexDaTabelaDeTokens += 1
-            if (
-                (self.token_atual().tipo == "token300_Num")
-                or (self.token_atual().tipo == "token611_boolValue")
-                or (self.token_atual().tipo == "token500_Id")
-            ):
-                temp.append(self.token_atual().lexema)
+            temp.append([])
+            self.atrib_var_escopo_main(temp)
+
+            if self.token_atual().tipo == "token200_;":
                 self.indexDaTabelaDeTokens += 1
-                if self.token_atual().tipo == "token200_;": 
-                    self.indexDaTabelaDeTokens += 1
-                    if not context:
-                        self.tabelaDeSimbolos.append(temp)
-                else:
-                    raise Exception(
-                        "Erro sintatico: falta do ponto e vírgula na linha "
-                        + str(self.token_atual().linha)
-                    )
+                if not context:
+                    self.tabelaDeSimbolos.append(temp)
             else:
                 raise Exception(
-                    "Erro sintatico: variável não atribuída na linha "
+                    "Erro sintatico: falta do ponto e virgula na linha "
                     + str(self.token_atual().linha)
-                )
+                )  
         else:
             raise Exception(
                 "Erro sintatico: símbolo de atribuição não encontrado na linha "
@@ -885,184 +904,111 @@ class Parser:
                             tempParenteses.append(tempParentesesParamAtual)
                  
                             self.indexDaTabelaDeTokens += 1
-                            if self.token_atual().tipo == "token201_,":
-                    
+                            while self.token_atual().tipo == "token201_,":
                                 self.params_declar(tempParenteses)  
-                                temp.append(tempParenteses)
-                                if self.token_atual().tipo == "token203_)":
+
+                            temp.append(tempParenteses)
+                            if self.token_atual().tipo == "token203_)":
+                                self.indexDaTabelaDeTokens += 1
+
+            
+                                nomeDaFuncao = temp[4]
+                                paramsDaFuncao = temp[5]
+
+                                self.tabelaDeTresEnderecos.append(
+                                    f'{nomeDaFuncao}:')
+                                self.tabelaDeTresEnderecos.append(
+                                    f'BeginFunc'
+                                )
+
+                                if self.token_atual().tipo == "token204_{":
+                        
+                                    self.indexEscopoAntesDaFuncao = (
+                                        self.indexEscopoAtual
+                                    )
+                                    self.indexEscopoAtual += 1
                                     self.indexDaTabelaDeTokens += 1
 
-             
-                                    nomeDaFuncao = temp[4]
-                                    paramsDaFuncao = temp[5]
+                                    tempBlock = []
+                        
+                                    while self.token_atual().tipo != "token603_return":
+                                        tempBlock.append(
+                                            self.block_escopo_main(context=True))
 
-                                    self.tabelaDeTresEnderecos.append(
-                                        f'{nomeDaFuncao}:')
-                                    self.tabelaDeTresEnderecos.append(
-                                        f'BeginFunc'
-                                    )
-
-                                    if self.token_atual().tipo == "token204_{":
-                            
-                                        self.indexEscopoAntesDaFuncao = (
-                                            self.indexEscopoAtual
+                                    temp.append(tempBlock)
+                                    tempReturn = []
+                                    if self.token_atual().tipo == "token603_return":
+                                        tempReturn.append(
+                                            self.indexEscopoAtual)
+                                        tempReturn.append(
+                                            self.token_atual().linha
                                         )
-                                        self.indexEscopoAtual += 1
-                                        self.indexDaTabelaDeTokens += 1
+                                        tempReturn.append(
+                                            self.token_atual().tipo)
+                        
+                                        tempReturnParams = []
+                                        tempReturnParams = self.return_declar(
+                                            tempReturnParams
+                                        )
+                                        tempReturn.append(tempReturnParams)
+                                        temp.append(tempReturn)
 
-                                        tempBlock = []
-                         
-                                        while self.token_atual().tipo != "token603_return":
-                                            tempBlock.append(
-                                                self.block_escopo_main(context=True))
-
-                                        temp.append(tempBlock)
-                                        tempReturn = []
-                                        if self.token_atual().tipo == "token603_return":
-                                            tempReturn.append(
-                                                self.indexEscopoAtual)
-                                            tempReturn.append(
-                                                self.token_atual().linha
-                                            )
-                                            tempReturn.append(
-                                                self.token_atual().tipo)
-                         
-                                            tempReturnParams = []
-                                            tempReturnParams = self.return_declar(
-                                                tempReturnParams
-                                            )
-                                            tempReturn.append(tempReturnParams)
-                                            temp.append(tempReturn)
-
-                                            if (len(tempReturn[3]) > 1):
-                                                if (len(tempReturn[3]) == 3):
-                                                    if tempReturn[3][0][0] != 'token604_call':
-                                                        self.tabelaDeTresEnderecos.append(('return := ' + tempReturn[2][0][0] + tempReturn[2][0][1] + tempReturn[2][0][2]))
-                                                    else:
-                                                        raise Exception(
-                                                            f'Erro semântico: Chamada de função não suportada no retorno {self.token_atual().linha}'
-                                                        )
-                                                else:
-                                                    lista = tempReturn[3][::-1]
-                                                    contador = 0    
-                                                    self.tabelaDeTresEnderecos.append(("temp"+str(self.tempAtualTresEnd) + " := " + lista[contador+2] + lista[contador+1] + lista[contador]))
-                                                    contador += 3
-                                                    self.tempAtualTresEnd += 1
-                                                    if(contador < len(lista)):
-                                                        self.salvarValores(lista, contador)
-                                                    self.tabelaDeTresEnderecos.append(('return := ' + "temp"+str(self.tempAtualTresEnd-1)))
-                                            else:
-                                                self.tabelaDeTresEnderecos.append(('return := ' + tempReturn[3][0][0]))
-                                            if self.token_atual().tipo == "token205_}":
-                                                self.tabelaDeTresEnderecos.append(('EndFunc'))
-                                                self.indexEscopoAtual = (
-                                                    self.indexEscopoAntesDaFuncao
-                                                )
-                                                self.indexDaTabelaDeTokens += 1
-
-                                                if (
-                                                    self.token_atual().tipo
-                                                    == "token602_endfunc"
-                                                ):
-                                                    self.indexDaTabelaDeTokens += 1
-                                                    self.tabelaDeSimbolos.append(temp)
+                                        if (len(tempReturn[3]) > 1):
+                                            if (len(tempReturn[3]) == 3):
+                                                if tempReturn[3][0][0] != 'token604_call':
+                                                    self.tabelaDeTresEnderecos.append(('return := ' + tempReturn[2][0][0] + tempReturn[2][0][1] + tempReturn[2][0][2]))
                                                 else:
                                                     raise Exception(
-                                                        "Erro sintatico: falta do ponto e vírgula na linha "
-                                                        + str(self.token_atual().linha)
+                                                        f'Erro semântico: Chamada de função não suportada no retorno {self.token_atual().linha}'
                                                     )
                                             else:
+                                                lista = tempReturn[3][::-1]
+                                                contador = 0    
+                                                self.tabelaDeTresEnderecos.append(("temp"+str(self.tempAtualTresEnd) + " := " + lista[contador+2] + lista[contador+1] + lista[contador]))
+                                                contador += 3
+                                                self.tempAtualTresEnd += 1
+                                                if(contador < len(lista)):
+                                                    self.salvarValores(lista, contador)
+                                                self.tabelaDeTresEnderecos.append(('return := ' + "temp"+str(self.tempAtualTresEnd-1)))
+                                        else:
+                                            self.tabelaDeTresEnderecos.append(('return := ' + tempReturn[3][0][0]))
+                                        if self.token_atual().tipo == "token205_}":
+                                            self.tabelaDeTresEnderecos.append(('EndFunc'))
+                                            self.indexEscopoAtual = (
+                                                self.indexEscopoAntesDaFuncao
+                                            )
+                                            self.indexDaTabelaDeTokens += 1
+
+                                            if (
+                                                self.token_atual().tipo
+                                                == "token602_endfunc"
+                                            ):
+                                                self.indexDaTabelaDeTokens += 1
+                                                self.tabelaDeSimbolos.append(temp)
+                                            else:
                                                 raise Exception(
-                                                    "Erro sintatico: falta da chave direita na linha "
+                                                    "Erro sintatico: falta do ponto e vírgula na linha "
                                                     + str(self.token_atual().linha)
                                                 )
                                         else:
                                             raise Exception(
-                                                "Erro sintatico: falta do retorno na linha "
-                                                + str(self.token_atual().linha)
-                                            )
-
-                                    else:
-                                        raise Exception(
-                                            "Erro sintatico: falta da chave esquerda na linha "
-                                            + str(self.token_atual().linha)
-                                        )
-                                else:
-                                    raise Exception(
-                                        "Erro sintatico: falta do parentese direito na linha "
-                                        + str(self.token_atual().linha)
-                                    )
-
-                            elif self.token_atual().tipo == "token203_)":
-
-                                temp.append(tempParenteses)
-                                if self.token_atual().tipo == "token203_)":
-                                    self.indexDaTabelaDeTokens += 1
-                                    if self.token_atual().tipo == "token204_{":
-                                        self.indexEscopoAntesDaFuncao = (
-                                            self.indexEscopoAtual
-                                        )
-                                        self.indexEscopoAtual += 1
-                                        self.indexDaTabelaDeTokens += 1
-                                        tempBlock = []
-                                        while self.token_atual().tipo != "token603_return":
-                                            tempBlock.append(
-                                                self.block_escopo_main())
-
-                                        temp.append(tempBlock)
-                                        tempReturn = []
-                                        if self.token_atual().tipo == "token603_return":
-                                            tempReturn.append(
-                                                self.indexEscopoAtual)
-                                            tempReturn.append(
-                                                self.token_atual().tipo)
-                                            tempReturnParms = []
-                                            tempReturnParms = self.return_declar(
-                                                tempReturnParms
-                                            )
-                                            tempReturn.append(tempReturnParms)
-                                            temp.append(tempReturn)
-                                            if self.token_atual().tipo == "token205_}":
-                                                self.indexEscopoAtual = (
-                                                    self.indexEscopoAntesDaFuncao
-                                                )
-                                                self.indexDaTabelaDeTokens += 1
-                                                if (
-                                                    self.token_atual().tipo
-                                                    == "token602_endfunc"
-                                                ):
-                                                    self.indexDaTabelaDeTokens += 1
-                                                    self.tabelaDeSimbolos.append(
-                                                        temp)
-                                                else:
-                                                    raise Exception(
-                                                        "Erro sintatico: falta do ponto e vírgula na linha "
-                                                        + str(self.token_atual().linha)
-                                                    )
-                                            else:
-                                                raise Exception(
-                                                    "Erro sintatico: falta da chave direita na linha "
-                                                    + str(self.token_atual().linha)
-                                                )
-                                        else:
-                                            raise Exception(
-                                                "Erro sintatico: falta do retorno na linha "
+                                                "Erro sintatico: falta da chave direita na linha "
                                                 + str(self.token_atual().linha)
                                             )
                                     else:
                                         raise Exception(
-                                            "Erro sintatico: falta da chave esquerda na linha "
+                                            "Erro sintatico: falta do retorno na linha "
                                             + str(self.token_atual().linha)
                                         )
+
                                 else:
                                     raise Exception(
-                                        "Erro sintatico: falta do parentese direito na linha "
+                                        "Erro sintatico: falta da chave esquerda na linha "
                                         + str(self.token_atual().linha)
                                     )
                             else:
-                           
                                 raise Exception(
-                                    "Erro sintatico: falta da virgula na linha "
+                                    "Erro sintatico: falta do parentese direito na linha "
                                     + str(self.token_atual().linha)
                                 )
                         else:
@@ -1072,87 +1018,10 @@ class Parser:
                             )
 
                     else:
-                        if self.token_atual().tipo == "token203_)":
-                            temp.append(tempParenteses)
-                            self.indexDaTabelaDeTokens += 1
-
-                            # exit(0)
-
-                            # nomeDaFuncao = temp[4]
-                            # paramsDaFuncao = temp[5]
-
-                            # self.tabelaDeTresEnderecos.append(
-                            #     ('label', nomeDaFuncao, 'null'))
-
-                            # for param in paramsDaFuncao:
-                            #     self.tabelaDeTresEnderecos.append(
-                            #         ('pop', param[2], 'null'))
-
-                            # self.tabelaDeTresEnderecos.append(
-                            #     ('push', self.tempTresEnderecos, 'null'))
-                            # self.tabelaDeTresEnderecos.append(
-                            #     ('ret', 'null', 'null'))
-
-                            if self.token_atual().tipo == "token204_{":
-                                self.indexEscopoAntesDaFuncao = self.indexEscopoAtual
-                                self.indexEscopoAtual += 1
-                                self.indexDaTabelaDeTokens += 1
-
-                                tempBlock = []
-              
-                                while self.token_atual().tipo != "token603_return":
-                                    tempBlock.append(self.block_escopo_main())
-
-                                temp.append(tempBlock)
-
-                                tempReturn = []
-                    
-                                if self.token_atual().tipo == "token603_return":
-                                    tempReturn.append(self.indexEscopoAtual)
-                                    tempReturn.append(self.token_atual().tipo)
-                          
-                                    tempReturnParms = []
-                                    tempReturnParms = self.return_declar(
-                                        tempReturnParms
-                                    )
-
-                                    tempReturn.append(tempReturnParms)
-                                    temp.append(tempReturn)
-                                    if self.token_atual().tipo == "token205_}":
-                                        self.indexEscopoAtual = (
-                                            self.indexEscopoAntesDaFuncao
-                                        )
-                                        self.indexDaTabelaDeTokens += 1
-                                        if self.token_atual().tipo == "token602_endfunc":
-                                            self.indexDaTabelaDeTokens += 1
-                            
-                                            self.tabelaDeSimbolos.append(temp)
-                                        else:
-                                            raise Exception(
-                                                "Erro sintatico: falta do ponto e vírgula na linha "
-                                                + str(self.token_atual().linha)
-                                            )
-                                    else:
-                                        raise Exception(
-                                            "Erro sintatico: falta da chave direita na linha "
-                                            + str(self.token_atual().linha)
-                                        )
-                                else:
-                                    raise Exception(
-                                        "Erro sintatico: falta do retorno na linha "
-                                        + str(self.token_atual().linha)
-                                    )
-
-                            else:
-                                raise Exception(
-                                    "Erro sintatico: falta da chave esquerda na linha "
-                                    + str(self.token_atual().linha)
-                                )
-                        else:
-                            raise Exception(
-                                "Erro sintatico: falta do parentese direito na linha "
-                                + str(self.token_atual().linha)
-                            )
+                        raise Exception(
+                            'Erro sintático: falta declaração de parâmetros da função, é obrigatório, linha '
+                            + str(self.token_atual().linha)
+                        )
                 else:
                     raise Exception(
                         "Erro sintatico: falta do parentese esquerdo na linha "
@@ -1275,206 +1144,50 @@ class Parser:
                         tempParenteses.append(tempParentesesParamAtual)
                 
                         self.indexDaTabelaDeTokens += 1
-                        if self.token_atual().tipo == "token201_,":
-                
-                            self.params_declar(tempParenteses)  
-                            temp.append(tempParenteses)
-                            if self.token_atual().tipo == "token203_)":
-                                self.indexDaTabelaDeTokens += 1
+                        while self.token_atual().tipo == "token201_,":
+                            self.params_declar(tempParenteses)
 
-            
-                                nomeDaFuncao = temp[4]
-                                paramsDaFuncao = temp[5]
-
-                                self.tabelaDeTresEnderecos.append(
-                                    f'{nomeDaFuncao}:')
-                                self.tabelaDeTresEnderecos.append(
-                                    f'BeginFunc'
-                                )
-
-                                if self.token_atual().tipo == "token204_{":
-                        
-                                    self.indexEscopoAntesDaFuncao = (
-                                        self.indexEscopoAtual
-                                    )
-                                    self.indexEscopoAtual += 1
-                                    self.indexDaTabelaDeTokens += 1
-
-                                    tempBlock = []
-                        
-                                    while self.token_atual().tipo != TOKEN_FECHA_CHAVES:
-                                        tempBlock.append(
-                                            self.block_escopo_main(context=True))
-
-                                    temp.append(tempBlock)
-                                    if self.token_atual().tipo == "token205_}":
-                                        self.tabelaDeTresEnderecos.append(('EndFunc'))
-                                        self.indexEscopoAtual = (
-                                            self.indexEscopoAntesDaFuncao
-                                        )
-                                        self.indexDaTabelaDeTokens += 1
-
-                                        if (
-                                            self.token_atual().tipo
-                                            == "token615_endproc"
-                                        ):
-                                            self.indexDaTabelaDeTokens += 1
-                                            self.tabelaDeSimbolos.append(temp)
-                                        else:
-                                            raise Exception(
-                                                "Erro sintatico: falta do ponto e vírgula na linha "
-                                                + str(self.token_atual().linha)
-                                            )
-                                    else:
-                                        raise Exception(
-                                            "Erro sintatico: falta da chave direita na linha "
-                                            + str(self.token_atual().linha)
-                                        )
-
-                                else:
-                                    raise Exception(
-                                        "Erro sintatico: falta da chave esquerda na linha "
-                                        + str(self.token_atual().linha)
-                                    )
-                            else:
-                                raise Exception(
-                                    "Erro sintatico: falta do parentese direito na linha "
-                                    + str(self.token_atual().linha)
-                                )
-
-                        elif self.token_atual().tipo == "token203_)":
-
-                            temp.append(tempParenteses)
-                            if self.token_atual().tipo == "token203_)":
-                                self.indexDaTabelaDeTokens += 1
-                                if self.token_atual().tipo == "token204_{":
-                                    self.indexEscopoAntesDaFuncao = (
-                                        self.indexEscopoAtual
-                                    )
-                                    self.indexEscopoAtual += 1
-                                    self.indexDaTabelaDeTokens += 1
-                                    tempBlock = []
-                                    while self.token_atual().tipo != "token603_return":
-                                        tempBlock.append(
-                                            self.block_escopo_main())
-
-                                    temp.append(tempBlock)
-                                    tempReturn = []
-                                    if self.token_atual().tipo == "token603_return":
-                                        tempReturn.append(
-                                            self.indexEscopoAtual)
-                                        tempReturn.append(
-                                            self.token_atual().tipo)
-                                        tempReturnParms = []
-                                        tempReturnParms = self.return_declar(
-                                            tempReturnParms
-                                        )
-                                        tempReturn.append(tempReturnParms)
-                                        temp.append(tempReturn)
-                                        if self.token_atual().tipo == "token205_}":
-                                            self.indexEscopoAtual = (
-                                                self.indexEscopoAntesDaFuncao
-                                            )
-                                            self.indexDaTabelaDeTokens += 1
-                                            if (
-                                                self.token_atual().tipo
-                                                == "token615_endproc"
-                                            ):
-                                                self.indexDaTabelaDeTokens += 1
-                                                self.tabelaDeSimbolos.append(
-                                                    temp)
-                                            else:
-                                                raise Exception(
-                                                    "Erro sintatico: falta do ponto e vírgula na linha "
-                                                    + str(self.token_atual().linha)
-                                                )
-                                        else:
-                                            raise Exception(
-                                                "Erro sintatico: falta da chave direita na linha "
-                                                + str(self.token_atual().linha)
-                                            )
-                                    else:
-                                        raise Exception(
-                                            "Erro sintatico: falta do retorno na linha "
-                                            + str(self.token_atual().linha)
-                                        )
-                                else:
-                                    raise Exception(
-                                        "Erro sintatico: falta da chave esquerda na linha "
-                                        + str(self.token_atual().linha)
-                                    )
-                            else:
-                                raise Exception(
-                                    "Erro sintatico: falta do parentese direito na linha "
-                                    + str(self.token_atual().linha)
-                                )
-                        else:
-                        
-                            raise Exception(
-                                "Erro sintatico: falta da virgula na linha "
-                                + str(self.token_atual().linha)
-                            )
-                    else:
-                        raise Exception(
-                            "Erro sintatico: falta o Id na linha "
-                            + str(self.token_atual().linha)
-                        )
-
-                else:
-                    if self.token_atual().tipo == "token203_)":
                         temp.append(tempParenteses)
-                        self.indexDaTabelaDeTokens += 1
-
-                        # exit(0)
-
-                        # nomeDaFuncao = temp[4]
-                        # paramsDaFuncao = temp[5]
-
-                        # self.tabelaDeTresEnderecos.append(
-                        #     ('label', nomeDaFuncao, 'null'))
-
-                        # for param in paramsDaFuncao:
-                        #     self.tabelaDeTresEnderecos.append(
-                        #         ('pop', param[2], 'null'))
-
-                        # self.tabelaDeTresEnderecos.append(
-                        #     ('push', self.tempTresEnderecos, 'null'))
-                        # self.tabelaDeTresEnderecos.append(
-                        #     ('ret', 'null', 'null'))
-
-                        if self.token_atual().tipo == "token204_{":
-                            self.indexEscopoAntesDaFuncao = self.indexEscopoAtual
-                            self.indexEscopoAtual += 1
+                        if self.token_atual().tipo == "token203_)":
                             self.indexDaTabelaDeTokens += 1
 
-                            tempBlock = []
-            
-                            while self.token_atual().tipo != "token603_return":
-                                tempBlock.append(self.block_escopo_main())
+        
+                            nomeDaFuncao = temp[4]
+                            paramsDaFuncao = temp[5]
 
-                            temp.append(tempBlock)
+                            self.tabelaDeTresEnderecos.append(
+                                f'{nomeDaFuncao}:')
+                            self.tabelaDeTresEnderecos.append(
+                                f'BeginFunc'
+                            )
 
-                            tempReturn = []
-                
-                            if self.token_atual().tipo == "token603_return":
-                                tempReturn.append(self.indexEscopoAtual)
-                                tempReturn.append(self.token_atual().tipo)
-                        
-                                tempReturnParms = []
-                                tempReturnParms = self.return_declar(
-                                    tempReturnParms
+                            if self.token_atual().tipo == "token204_{":
+                    
+                                self.indexEscopoAntesDaFuncao = (
+                                    self.indexEscopoAtual
                                 )
+                                self.indexEscopoAtual += 1
+                                self.indexDaTabelaDeTokens += 1
 
-                                tempReturn.append(tempReturnParms)
-                                temp.append(tempReturn)
+                                tempBlock = []
+                    
+                                while self.token_atual().tipo != TOKEN_FECHA_CHAVES:
+                                    tempBlock.append(
+                                        self.block_escopo_main(context=True))
+
+                                temp.append(tempBlock)
                                 if self.token_atual().tipo == "token205_}":
+                                    self.tabelaDeTresEnderecos.append(('EndFunc'))
                                     self.indexEscopoAtual = (
                                         self.indexEscopoAntesDaFuncao
                                     )
                                     self.indexDaTabelaDeTokens += 1
-                                    if self.token_atual().tipo == "token615_endproc":
+
+                                    if (
+                                        self.token_atual().tipo
+                                        == "token615_endproc"
+                                    ):
                                         self.indexDaTabelaDeTokens += 1
-                        
                                         self.tabelaDeSimbolos.append(temp)
                                     else:
                                         raise Exception(
@@ -1486,22 +1199,29 @@ class Parser:
                                         "Erro sintatico: falta da chave direita na linha "
                                         + str(self.token_atual().linha)
                                     )
+
                             else:
                                 raise Exception(
-                                    "Erro sintatico: falta do retorno na linha "
+                                    "Erro sintatico: falta da chave esquerda na linha "
                                     + str(self.token_atual().linha)
                                 )
-
                         else:
                             raise Exception(
-                                "Erro sintatico: falta da chave esquerda na linha "
+                                "Erro sintatico: falta do parentese direito na linha "
                                 + str(self.token_atual().linha)
                             )
+
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do parentese direito na linha "
+                            "Erro sintatico: falta o Id na linha "
                             + str(self.token_atual().linha)
                         )
+
+                else:
+                    raise Exception(
+                        'Erro sintático: falta declaração de parâmetros da função ou procedimento, é obrigatório, linha '
+                        + str(self.token_atual().linha)
+                    )
             else:
                 raise Exception(
                     "Erro sintatico: falta do parentese esquerdo na linha "
@@ -1671,7 +1391,7 @@ class Parser:
 
 
             self.tabelaDeTresEnderecos.append(
-                ('print', self.tempTresEnderecos, 'null'))
+                f'write {temp[3][0]}')
             if self.token_atual().tipo == "token203_)":
                 self.indexDaTabelaDeTokens += 1
                 if self.token_atual().tipo == "token200_;":
@@ -1863,7 +1583,7 @@ class Parser:
                         self.token_atual().tipo != "token205_}"
                         and self.token_look_ahead().tipo != "token605_endif"
                     ):
-                        tempBlock.append(self.block_escopo_if(context=True))
+                        tempBlock.append(self.block_escopo_if(context=context, is_while=False))
 
                     temp.append(tempBlock)
                     if self.token_atual().tipo == "token205_}":
@@ -1877,7 +1597,7 @@ class Parser:
                                 tempElse.append(self.indexEscopoAtual)
                                 tempElse.append(self.token_atual().tipo)
                                 tempElse = self.else_part_escopo_main(
-                                    tempElse)  
+                                    tempElse, context=context)  
 
                                 temp.append(tempElse)
                                 if not context:
@@ -1916,7 +1636,7 @@ class Parser:
             )
 
 
-    def else_part_escopo_main(self, tempElse):
+    def else_part_escopo_main(self, tempElse, context = False):
         olhaAfrente = self.token_look_ahead()
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token204_{" and olhaAfrente.tipo != "token205_}":
@@ -1926,7 +1646,7 @@ class Parser:
                 self.token_atual().tipo != "token205_}"
                 and self.token_look_ahead().tipo != "token606_endelse"
             ):
-                tempBlock.append(self.block_escopo_if())
+                tempBlock.append(self.block_escopo_if(context=context))
             tempElse.append(tempBlock)
             if self.token_atual().tipo == "token205_}":
                 self.indexDaTabelaDeTokens += 1
@@ -1951,7 +1671,7 @@ class Parser:
             )
 
 
-    def if_escopo_main_flow(self, temp, context=False):
+    def if_escopo_main_flow(self, temp, context=False, is_while=False):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token202_(":
             self.indexDaTabelaDeTokens += 1
@@ -1981,7 +1701,7 @@ class Parser:
                                 tempElse.append(self.indexEscopoAtual)
                                 tempElse.append(self.token_atual().tipo)
                                 tempElse = self.else_escopo_main_flow(
-                                    tempElse)  
+                                    tempElse, is_while=is_while)  
 
                                 temp.append(tempElse)
                                 if not context:
@@ -2020,7 +1740,7 @@ class Parser:
             )
 
 
-    def else_escopo_main_flow(self, tempElse):
+    def else_escopo_main_flow(self, tempElse, is_while=False):
         olhaAfrente = self.token_look_ahead()
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token204_{" and olhaAfrente.tipo != "token205_}":
@@ -2030,7 +1750,7 @@ class Parser:
                 self.token_atual().tipo != "token205_}"
                 and self.token_look_ahead().tipo != "token606_endelse"
             ):
-                tempBlock.append(self.block_escopo_while())
+                tempBlock.append(self.block_escopo_if(is_while=is_while))
             tempElse.append(tempBlock)
             if self.token_atual().tipo == "token205_}":
                 self.indexDaTabelaDeTokens += 1
@@ -2195,19 +1915,19 @@ class Parser:
 
  #Análise Semântica
 
-    def checkSemantica(self):
+    def check_semantica(self):
         for k in range(len(self.tabelaDeSimbolos)):
             simbolo = self.tabelaDeSimbolos[k][2]
-            if simbolo == "token602_func":
+            if simbolo == TOKEN_FUNC:
                 self.declaration_func_semantico(self.tabelaDeSimbolos[k])
 
-            elif simbolo == "token615_proc":
+            elif simbolo == TOKEN_PROC:
                 self.declaration_proc_semantico(self.tabelaDeSimbolos[k])
 
-            elif simbolo == "token604_call":
+            elif simbolo == TOKEN_CALL:
                 self.buscar_proc_decl_semantica(self.tabelaDeSimbolos[k])
 
-            elif simbolo == "token609_int" or simbolo == "token610_bool":
+            elif simbolo == TOKEN_INT or simbolo == TOKEN_BOOL:
                 var_decl = self.buscar_var_decl(self.tabelaDeSimbolos[k])
                 if var_decl:
                     raise Exception(
@@ -2215,13 +1935,16 @@ class Parser:
                         + str(self.tabelaDeSimbolos[k][1])
                     )
 
-            elif simbolo == "token605_if":
+            elif simbolo == TOKEN_IF:
                 self.expression_semantico(self.tabelaDeSimbolos[k])
 
-            elif simbolo == "token607_while":
+            elif simbolo == TOKEN_ELSE:
                 self.expression_semantico(self.tabelaDeSimbolos[k])
 
-            elif simbolo == "token500_Id":
+            elif simbolo == TOKEN_WHILE:
+                self.expression_semantico(self.tabelaDeSimbolos[k])
+
+            elif simbolo == TOKEN_ID:
                 self.call_var_semantico(self.tabelaDeSimbolos[k])
 
         print("#============================#\n")
