@@ -483,7 +483,7 @@ class Parser:
             ):
                 if (len(i[5]) == len(dados[5][2])):
                     for index, param in enumerate(i[5]):
-                        if (i[5][index][1] == 'token609_int'):
+                        if (i[5][index][1] == TOKEN_INT):
                             if not dados[5][2][index].isnumeric():
                                 var_decl = self.call_buscar_var_decl(dados, dados[5][2][index])
                                 if var_decl:
@@ -501,6 +501,15 @@ class Parser:
                                     f'Erro semântico: Valor "{dados[5][2][index]}" não suportado no {index+1}º parâmetro da função {i[4]}, linha '
                                 )
                     return i
+
+    def buscar_func_decl_nome(self, dados):
+        for i in self.tabelaDeSimbolos:
+            if (i[2] == 'token602_func'
+                and i[4] == dados[4]
+                and i[0] <= dados[0]
+                and i[1] < dados[1]
+            ):
+                return i
 
     def buscar_proc_decl_semantica(self, dados):
         for i in self.tabelaDeSimbolos:
@@ -711,9 +720,9 @@ class Parser:
         )
 
     def salvar_call_proc_tres_enderecos(self, dados):
-        for param in dados[4]:
+        for i in reversed(range(len(dados[4]))):
             self.tabelaDeTresEnderecos.append(
-                f'param {param}'
+                f'param {dados[4][i]}'
             )
             
         self.tabelaDeTresEnderecos.append(
@@ -766,8 +775,8 @@ class Parser:
                         #     f'Erro semântico: Chamada de função não declarada na linha {self.token_atual().linha}'
                         # )
                         func_declaration = []
-                    for func_param in func_declaration:
-                        self.tabelaDeTresEnderecos.append(f'param {func_param}')
+                    for i in reversed(range(len(func_declaration))):
+                        self.tabelaDeTresEnderecos.append(f'param {func_declaration[i]}')
                     self.tabelaDeTresEnderecos.append((dados[3] + ' := call ' + dados[5][1] + ',' + str(n_params)))
             else:
                 lista = dados[5][::-1]
@@ -2708,6 +2717,12 @@ class Parser:
             return False
 
     def declaration_func_semantico(self, tabelaNoIndiceAtual):
+        func_decl = self.buscar_func_decl_nome(tabelaNoIndiceAtual)
+        if func_decl:
+            raise Exception(
+                f'Erro semântico: Nome da função "{tabelaNoIndiceAtual[4]}" já definido, linha '
+                + str(tabelaNoIndiceAtual[1])
+            )
         func_params = [[param[0], tabelaNoIndiceAtual[1], param[1], param[2]] for param in tabelaNoIndiceAtual[5]]
         for param in tabelaNoIndiceAtual[5]:
             check_repetition = [p[2] for p in tabelaNoIndiceAtual[5] if p[2] == param[2]]
