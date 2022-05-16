@@ -30,10 +30,6 @@ class Parser:
         self.indexEscopoAtual += 1
         self.escopo()  
 
-        #for linha in self.tabelaDeTresEnderecos:
-        #   pprint(linha)
-        #print('\n')
-
         self.check_semantica()
         return
 
@@ -67,22 +63,22 @@ class Parser:
                         )                     
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do endmain na linha "
+                            "Erro sintático: falta do endmain na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do } na linha "
+                        "Erro sintático: falta do } na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do { na linha "
+                    "Erro sintático: falta do { na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: Código fora do padrão na linha "
+                "Erro sintático: Código fora do padrão na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -128,7 +124,7 @@ class Parser:
                 return temp
             else:
                 raise Exception(
-                    "Erro sintatico: falta do ponto e virgula na linha "
+                    "Erro sintático: falta do ponto e virgula na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -166,14 +162,13 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            # temp.append(self.token_atual().lexema)
             self.declaration_var_escopo_main(temp, is_attribution=True, context=context)
-            # self.call_var_escopo_main(temp)
             return temp
 
         else:
             raise Exception(
-                f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual'
+                f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual, linha '
+                + str(self.token_atual().linha)
             )
 
     # o bloco que contém break/continue que só pode ser chamado dentro de um while
@@ -205,7 +200,7 @@ class Parser:
                     return temp
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do ponto e virgula na linha "
+                        "Erro sintático: falta do ponto e virgula na linha "
                         + str(self.token_atual().linha)
                     )
 
@@ -219,12 +214,12 @@ class Parser:
                     return temp
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do ponto e virgula na linha "
+                        "Erro sintático: falta do ponto e virgula na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta de proc ou func na linha "
+                    "Erro sintático: falta de proc ou func na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -249,7 +244,7 @@ class Parser:
 
         if self.token_atual().tipo == "token606_else":
             raise Exception(
-                "Erro sintatico: else adicionado de maneira incorreta "
+                "Erro sintático: else adicionado de maneira incorreta "
                 + str(self.token_atual().linha)
             )
 
@@ -283,7 +278,8 @@ class Parser:
 
         else:
             raise Exception(
-                f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual'
+                f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual, linha '
+                + str(self.token_atual().linha)
             )
 
     # é o que só pode ser chamado dentro de um if
@@ -315,7 +311,7 @@ class Parser:
                     return temp
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do ponto e virgula na linha "
+                        "Erro sintático: falta do ponto e virgula na linha "
                         + str(self.token_atual().linha)
                     )
 
@@ -329,12 +325,12 @@ class Parser:
                     return temp
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do ponto e virgula na linha "
+                        "Erro sintático: falta do ponto e virgula na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta de proc ou func na linha"
+                    "Erro sintático: falta de proc ou func na linha"
                     + str(self.token_atual().linha)
                 )
 
@@ -358,7 +354,7 @@ class Parser:
 
         if self.token_atual().tipo == "token606_else":
             raise Exception(
-                "Erro sintatico: else adicionado de maneira incorreta "
+                "Erro sintático: else adicionado de maneira incorreta "
                 + str(self.token_atual().linha)
             )
 
@@ -390,7 +386,8 @@ class Parser:
 
         else:
             raise Exception(
-                f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual'
+                f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual, linha '
+                + str(self.token_atual().linha)
             )
 
     def declaration_var_escopo_main(self, temp, is_attribution = False, context = False):
@@ -411,7 +408,7 @@ class Parser:
                         self.tabelaDeSimbolos.append(temp)
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do ponto e virgula na linha "
+                        "Erro sintático: falta do ponto e virgula na linha "
                         + str(self.token_atual().linha)
                     )                
             elif self.token_atual().tipo == "token200_;":
@@ -420,14 +417,14 @@ class Parser:
                     self.tabelaDeSimbolos.append(temp)
             else:
                 raise Exception(
-                    f"Erro sintatico: token {self.token_atual().lexema} não é permitido em declaração de variável, linha "
+                    f"Erro sintático: token {self.token_atual().lexema} não é permitido em declaração de variável, linha "
                     + str(self.token_atual().linha)
                 )
         elif self.token_atual().tipo == TOKEN_CALL:
             proc_dec = self.buscar_proc_decl()
         else:
             raise Exception(
-                "Erro sintatico: nome da variável precisa ser declarado na linha " +
+                "Erro sintático: nome da variável precisa ser declarado na linha " +
                 str(self.token_atual().linha)
             )
 
@@ -447,6 +444,7 @@ class Parser:
                                     continue
                                 raise Exception(
                                     f'Erro semântico: Valor "{dados[5][2][index]}" não suportado no {index+1}º parâmetro da função {i[4]}, linha '
+                                    + str(dados[1])
                                 )
                         elif (i[5][index][1] == TOKEN_BOOL):
                             if (dados[5][2][index] != 'True'
@@ -456,6 +454,7 @@ class Parser:
                                     continue
                                 raise Exception(
                                     f'Erro semântico: Valor "{dados[5][2][index]}" não suportado no {index+1}º parâmetro da função {i[4]}, linha '
+                                    + str(dados[1])
                                 )
                     return i
 
@@ -484,6 +483,7 @@ class Parser:
                                     continue
                                 raise Exception(
                                     f'Erro semântico: Valor "{dados[4][index]}" não suportado no {index+1}º parâmetro da função {i[4]}, linha '
+                                    + str(dados[1])
                                 )
                         elif (i[5][index][1] == TOKEN_BOOL):
                             if (dados[4][index] != 'True'
@@ -493,6 +493,7 @@ class Parser:
                                     continue
                                 raise Exception(
                                     f'Erro semântico: Valor "{dados[4][index]}" não suportado no {index+1}º parâmetro da função {i[4]}, linha '
+                                    + str(dados[1])
                                 )
                     return i
 
@@ -763,9 +764,6 @@ class Parser:
                     n_params = len(dados[5][2])
                     func_declaration = self.buscar_func_decl(dados)
                     if not func_declaration:
-                        # raise Exception(
-                        #     f'Erro semântico: Chamada de função não declarada na linha {self.token_atual().linha}'
-                        # )
                         func_declaration = []
                     for i in reversed(range(len(func_declaration))):
                         self.tabelaDeTresEnderecos.append(f'param {func_declaration[i]}')
@@ -777,7 +775,7 @@ class Parser:
                 contador += 3
                 self.tempAtualTresEnd += 1
                 if(contador < len(lista)):
-                    self.salvarValores(lista, contador)
+                    self.salvar_valores(lista, contador)
                 self.tabelaDeTresEnderecos.append((dados[3] + ' := ' + "temp"+str(self.tempAtualTresEnd-1)))
         else:
             self.tabelaDeTresEnderecos.append((dados[3] + ' := ' + dados[5][0]))
@@ -803,7 +801,7 @@ class Parser:
                 return
             else:
                 raise Exception(
-                    "Erro sintatico: Valor Booleano atribuido erroneamente na linha "
+                    "Erro sintático: Valor Booleano atribuido erroneamente na linha "
                     + str(self.token_atual().linha)
                 )
         if self.token_atual().tipo == "token300_Num":
@@ -840,7 +838,7 @@ class Parser:
                 return
         else:
             raise Exception(
-                "Erro sintatico: atribuição de variavel inválida na linha "
+                "Erro sintático: atribuição de variavel inválida na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -859,12 +857,12 @@ class Parser:
                     self.tabelaDeSimbolos.append(temp)
             else:
                 raise Exception(
-                    "Erro sintatico: falta do ponto e virgula na linha "
+                    "Erro sintático: falta do ponto e virgula na linha "
                     + str(self.token_atual().linha)
                 )  
         else:
             raise Exception(
-                "Erro sintatico: símbolo de atribuição não encontrado na linha "
+                "Erro sintático: símbolo de atribuição não encontrado na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -968,7 +966,7 @@ class Parser:
                                                 contador += 3
                                                 self.tempAtualTresEnd += 1
                                                 if(contador < len(lista)):
-                                                    self.salvarValores(lista, contador)
+                                                    self.salvar_valores(lista, contador)
                                                 self.tabelaDeTresEnderecos.append(('return := ' + "temp"+str(self.tempAtualTresEnd-1)))
                                         else:
                                             self.tabelaDeTresEnderecos.append(('return := ' + tempReturn[3][0][0]))
@@ -987,33 +985,33 @@ class Parser:
                                                 self.tabelaDeSimbolos.append(temp)
                                             else:
                                                 raise Exception(
-                                                    "Erro sintatico: falta do ponto e vírgula na linha "
+                                                    "Erro sintático: falta do ponto e vírgula na linha "
                                                     + str(self.token_atual().linha)
                                                 )
                                         else:
                                             raise Exception(
-                                                "Erro sintatico: falta da chave direita na linha "
+                                                "Erro sintático: falta da chave direita na linha "
                                                 + str(self.token_atual().linha)
                                             )
                                     else:
                                         raise Exception(
-                                            "Erro sintatico: falta do retorno na linha "
+                                            "Erro sintático: falta do retorno na linha "
                                             + str(self.token_atual().linha)
                                         )
 
                                 else:
                                     raise Exception(
-                                        "Erro sintatico: falta da chave esquerda na linha "
+                                        "Erro sintático: falta da chave esquerda na linha "
                                         + str(self.token_atual().linha)
                                     )
                             else:
                                 raise Exception(
-                                    "Erro sintatico: falta do parentese direito na linha "
+                                    "Erro sintático: falta do parentese direito na linha "
                                     + str(self.token_atual().linha)
                                 )
                         else:
                             raise Exception(
-                                "Erro sintatico: falta o ID na linha "
+                                "Erro sintático: falta o ID na linha "
                                 + str(self.token_atual().linha)
                             )
 
@@ -1024,12 +1022,12 @@ class Parser:
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do parentese esquerdo na linha "
+                        "Erro sintático: falta do parentese esquerdo na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do ID na linha "
+                    "Erro sintático: falta do ID na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -1048,7 +1046,7 @@ class Parser:
                 return tempReturnParams
             else:
                 raise Exception(
-                    "Erro sintatico: Erro de chamada, só é permitido chamada de funções na linha "
+                    "Erro sintático: Erro de chamada, só é permitido chamada de funções na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -1067,12 +1065,12 @@ class Parser:
                 return tempReturnParams
             else:
                 raise Exception(
-                    "Erro sintatico: falta do ponto e virgula na linha "
+                    "Erro sintático: falta do ponto e virgula na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: Retorno errado na linha "
+                "Erro sintático: Retorno errado na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -1095,19 +1093,19 @@ class Parser:
                     self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool"
                 ):
                     raise Exception(
-                        "Erro sintatico: falta vírgula na linha "
+                        "Erro sintático: falta vírgula na linha "
                         + str(self.token_atual().linha)
                     )
                 else:
                     return tempParenteses
             else:
                 raise Exception(
-                    "Erro sintatico: é necessário informar alguma váriavel na linha "
+                    "Erro sintático: é necessário informar alguma váriavel na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: é necessário informar um tipo na linha "
+                "Erro sintático: é necessário informar um tipo na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -1191,29 +1189,29 @@ class Parser:
                                         self.tabelaDeSimbolos.append(temp)
                                     else:
                                         raise Exception(
-                                            "Erro sintatico: falta do ponto e vírgula na linha "
+                                            "Erro sintático: falta do ponto e vírgula na linha "
                                             + str(self.token_atual().linha)
                                         )
                                 else:
                                     raise Exception(
-                                        "Erro sintatico: falta da chave direita na linha "
+                                        "Erro sintático: falta da chave direita na linha "
                                         + str(self.token_atual().linha)
                                     )
 
                             else:
                                 raise Exception(
-                                    "Erro sintatico: falta da chave esquerda na linha "
+                                    "Erro sintático: falta da chave esquerda na linha "
                                     + str(self.token_atual().linha)
                                 )
                         else:
                             raise Exception(
-                                "Erro sintatico: falta do parentese direito na linha "
+                                "Erro sintático: falta do parentese direito na linha "
                                 + str(self.token_atual().linha)
                             )
 
                     else:
                         raise Exception(
-                            "Erro sintatico: falta o Id na linha "
+                            "Erro sintático: falta o Id na linha "
                             + str(self.token_atual().linha)
                         )
 
@@ -1224,7 +1222,7 @@ class Parser:
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do parentese esquerdo na linha "
+                    "Erro sintático: falta do parentese esquerdo na linha "
                     + str(self.token_atual().linha)
                 )
         else:
@@ -1264,7 +1262,7 @@ class Parser:
                         return temp
                     else:
                         raise Exception(
-                            "Erro sintatico: falta da virgula na linha "
+                            "Erro sintático: falta da virgula na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
@@ -1275,17 +1273,17 @@ class Parser:
                         return temp
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do parentese direito na linha "
+                            "Erro sintático: falta do parentese direito na linha "
                             + str(self.token_atual().linha)
                         )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do parentese esquerdo na linha "
+                    "Erro sintático: falta do parentese esquerdo na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do ID na linha " +
+                "Erro sintático: falta do ID na linha " +
                 str(self.token_atual().linha)
             )
 
@@ -1316,7 +1314,7 @@ class Parser:
                             return temp
                         else:
                             raise Exception(
-                                "Erro sintatico: falta do parentese direito na linha "
+                                "Erro sintático: falta do parentese direito na linha "
                                 + str(self.token_atual().linha)
                             )
                     elif self.token_atual().tipo == "token203_)":
@@ -1325,7 +1323,7 @@ class Parser:
                         return temp
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do parentese direito na linha "
+                            "Erro sintático: falta do parentese direito na linha "
                             + str(self.token_atual().linha)
                         )
 
@@ -1337,17 +1335,17 @@ class Parser:
                         return temp
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do parentese direito na linha "
+                            "Erro sintático: falta do parentese direito na linha "
                             + str(self.token_atual().linha)
                         )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do parentese esquerdo na linha "
+                    "Erro sintático: falta do parentese esquerdo na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta o nome da função na linha " +
+                "Erro sintático: falta o nome da função na linha " +
                 str(self.token_atual().linha)
             )
 
@@ -1370,7 +1368,7 @@ class Parser:
                 or self.token_atual().tipo == "token300_Num"
             ):
                 raise Exception(
-                    "Erro sintatico: falta vírgula na linha "
+                    "Erro sintático: falta vírgula na linha "
                     + str(self.token_atual().linha)
                 )
             else:
@@ -1378,7 +1376,7 @@ class Parser:
                 return tempParams
         else:
             raise Exception(
-                "Erro sintatico: é necessário informar alguma váriavel na linha "
+                "Erro sintático: é necessário informar alguma váriavel na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -1401,17 +1399,17 @@ class Parser:
                 else:
 
                     raise Exception(
-                        "Erro sintatico: falta do ponto e virgula na linha "
+                        "Erro sintático: falta do ponto e virgula na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do Parentese direito na linha "
+                    "Erro sintático: falta do Parentese direito na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do Parentese esquerdo na linha  "
+                "Erro sintático: falta do Parentese esquerdo na linha  "
                 + str(self.token_atual().linha)
             )
 
@@ -1427,12 +1425,12 @@ class Parser:
                 return tempParams
             elif self.token_atual().tipo == "token615_proc":
                 raise Exception(
-                    "Erro sintatico: Procedimento não tem retorno na linha "
+                    "Erro sintático: Procedimento não tem retorno na linha "
                     + str(self.token_atual().linha)
                 )
             else:
                 raise Exception(
-                    "Erro sintatico: chamada incorreta de função na linha "
+                    "Erro sintático: chamada incorreta de função na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -1456,7 +1454,7 @@ class Parser:
                 return tempParams
         else:
             raise Exception(
-                "Erro sintatico: uso incorreto dos parametros na linha "
+                "Erro sintático: uso incorreto dos parametros na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -1490,79 +1488,6 @@ class Parser:
                 "Erro sintático: falta do } ou bloco vazio na linha " +
                 str(self.token_atual().linha)
             )   
-
-    def if_escopo_While(self, temp, is_proc: bool): 
-        self.indexToken += 1
-        if self.token_atual().tipo == "token202_(":
-            self.indexToken += 1
-            tempExpression = []
-            tempExpression = self.expression_escopo_main(tempExpression)
-            temp.append(tempExpression)
-        
-            if self.token_atual().tipo == "token203_)":
-                lookAhead = self.token_look_ahead()
-                self.indexToken += 1
-                if self.token_atual().tipo == "token204_{" and lookAhead.tipo != "token205_}":
-                    self.indexToken +=1
-                    self.indexEscopoAtual += 1
-                    tempBlock = []
-            
-                    while(self.token_atual().tipo != "token205_}"
-                        and self.tokenLookAhead().tipo != "token605_endif"):
-                        if(self.tokenAtual().tipo == "token603_return" and is_proc):
-                            raise Exception(
-                                "Erro sintático: return declarado dentro de um procedimento na linha "
-                                + str(self.tokenAtual().linha)
-                            ) 
-                        tempBlock.append(self.blockescopo_main(True, True))
-            
-                    temp.append(tempBlock)          
-
-                    if self.token_atual().tipo == "token205_}": 
-                        self.indexToken += 1
-                        if self.token_atual().tipo == "token605_endif":
-                            temp.append(self.token_atual().tipo)
-                            self.indexToken += 1
-                        
-                            tempElse = []
-                            if self.token_atual().tipo == "token606_else":
-                                tempElse.append(self.indexEscopoAtual)
-                                tempElse.append(self.token_atual().tipo)
-                                tempElse = self.else_escopo_while(tempElse)     
-                                
-                                temp.append(tempElse)
-                                self.tabelaDeSimbolos.append(temp)
-                                self.indexEscopoAtual -= 1   
-                            else:
-                                temp.append(tempElse)
-                                self.tabelaDeSimbolos.append(temp)
-                                self.indexEscopoAtual -= 1
-                                return                           
-                        else:
-                            raise Exception(
-                                "Erro sintático: falta de token605_endif "
-                                + str(self.token_atual().linha)
-                            )
-                    else:
-                        raise Exception(
-                        "Erro sintático: falta do token205_} na linha " +
-                        str(self.token_atual().linha)
-                        )
-                else:
-                    raise Exception(
-                        "Erro sintático: falta do token204_{ ou bloco vazio na linha "
-                        + str(self.token_atual().linha)
-                    )
-            else:
-                raise Exception(
-                    "Erro sintático: falta do parêntese direito na linha " + 
-                    str(self.token_atual().linha)
-                )
-        else:
-            raise Exception(
-                "Erro sintático: falta do parêntese esquerdo na linha " +
-                str(self.token_atual().linha)
-            )
 
     def if_escopo_main(self, temp, context=False):
         self.indexDaTabelaDeTokens += 1
@@ -1611,27 +1536,27 @@ class Parser:
                                 return
                         else:
                             raise Exception(
-                                "Erro sintatico: falta de endif na linha "
+                                "Erro sintático: falta de endif na linha "
                                 + str(self.token_atual().linha)
                             )
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do } na linha "
+                            "Erro sintático: falta do } na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do { ou bloco vazio na linha "
+                        "Erro sintático: falta do { ou bloco vazio na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do Parentese direito na linha  "
+                    "Erro sintático: falta do Parentese direito na linha  "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do Parentese esquerdo na linha  "
+                "Erro sintático: falta do Parentese esquerdo na linha  "
                 + str(self.token_atual().linha)
             )
 
@@ -1656,17 +1581,17 @@ class Parser:
                     return tempElse
                 else:
                     raise Exception(
-                        "Erro sintatico: falta de token606_endelse na linha "
+                        "Erro sintático: falta de token606_endelse na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do } na linha "
+                    "Erro sintático: falta do } na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do { ou bloco vazio na linha "
+                "Erro sintático: falta do { ou bloco vazio na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -1715,27 +1640,27 @@ class Parser:
                                 return
                         else:
                             raise Exception(
-                                "Erro sintatico: falta de endif na linha "
+                                "Erro sintático: falta de endif na linha "
                                 + str(self.token_atual().linha)
                             )
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do } na linha "
+                            "Erro sintático: falta do } na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do { ou Bloco vazio na linha "
+                        "Erro sintático: falta do { ou Bloco vazio na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do Parentese direito na linha  "
+                    "Erro sintático: falta do Parentese direito na linha  "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do Parentese esquerdo na linha  "
+                "Erro sintático: falta do Parentese esquerdo na linha  "
                 + str(self.token_atual().linha)
             )
 
@@ -1760,17 +1685,17 @@ class Parser:
                     return tempElse
                 else:
                     raise Exception(
-                        "Erro sintatico: falta de endelse na linha "
+                        "Erro sintático: falta de endelse na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do } na linha "
+                    "Erro sintático: falta do } na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do { ou bloco vazio na linha "
+                "Erro sintático: falta do { ou bloco vazio na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -1805,27 +1730,27 @@ class Parser:
                             self.indexEscopoAtual -= 1
                         else:
                             raise Exception(
-                                "Erro sintatico: falta de endwhile na linha "
+                                "Erro sintático: falta de endwhile na linha "
                                 + str(self.token_atual().linha)
                             )
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do } na linha "
+                            "Erro sintático: falta do } na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do { na linha "
+                        "Erro sintático: falta do { na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do ) na linha "
+                    "Erro sintático: falta do ) na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do ( na linha "
+                "Erro sintático: falta do ( na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -1837,7 +1762,7 @@ class Parser:
                 self.indexDaTabelaDeTokens += 1
             else:
                 raise Exception(
-                    "Erro sintatico: falta do ponto e virgula na linha "
+                    "Erro sintático: falta do ponto e virgula na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -1847,7 +1772,7 @@ class Parser:
                 self.indexDaTabelaDeTokens += 1
             else:
                 raise Exception(
-                    "Erro sintatico: falta do ponto e virgula na linha "
+                    "Erro sintático: falta do ponto e virgula na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -1872,17 +1797,17 @@ class Parser:
                     return tempExpression
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do Id na linha "
+                        "Erro sintático: falta do Id na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do operador booleano na linha "
+                    "Erro sintático: falta do operador booleano na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do ID na linha " +
+                "Erro sintático: falta do ID na linha " +
                 str(self.token_atual().linha)
             )
 
@@ -1905,16 +1830,11 @@ class Parser:
                 return
         else:
             raise Exception(
-                "Erro sintatico: falta do ID na linha " +
+                "Erro sintático: falta do ID na linha " +
                 str(self.token_atual().linha)
             )
 
-
-
-
-
- #Análise Semântica
-
+    #Análise Semântica
     def check_semantica(self):
         for k in range(len(self.tabelaDeSimbolos)):
             simbolo = self.tabelaDeSimbolos[k][2]
@@ -1989,7 +1909,7 @@ class Parser:
             if simbolo == "token500_Id":
                 self.call_var_func_semantico(token, func_context, func_params)
         
-    def buscarNaTabelaDeSimbolos(self, simbolo, indice):
+    def buscar_na_tabela_de_simbolos(self, simbolo, indice):
         for k in range(len(self.tabelaDeSimbolos)):
             if self.tabelaDeSimbolos[k][indice] == simbolo:
                 return self.tabelaDeSimbolos[k]
@@ -2018,7 +1938,7 @@ class Parser:
                                         tabelaNoIndiceAtual[5][3]
                                     ):
                                         for n in range(len(tabelaNoIndiceAtual[5][3])):
-                                            varDeclaradaNaTabela = self.buscarNaTabelaDeSimbolos(
+                                            varDeclaradaNaTabela = self.buscar_na_tabela_de_simbolos(
                                                 tabelaNoIndiceAtual[5][3][n], 3)
                                             if(varDeclaradaNaTabela != None):
                                                 if (varDeclaradaNaTabela[0] <= tabelaNoIndiceAtual[0]
@@ -2069,7 +1989,7 @@ class Parser:
                     )
 
             if simbolo.isalpha() and simbolo != 'True' and simbolo != 'False':
-                varDeclarada = self.buscarNaTabelaDeSimbolos(
+                varDeclarada = self.buscar_na_tabela_de_simbolos(
                     tabelaNoIndiceAtual[5][0], 3
                 )
                 if varDeclarada != None:
@@ -2130,7 +2050,7 @@ class Parser:
                                         tabelaNoIndiceAtual[5][3]
                                     ):
                                         for n in range(len(tabelaNoIndiceAtual[5][3])):
-                                            varDeclaradaNaTabela = self.buscarNaTabelaDeSimbolos(
+                                            varDeclaradaNaTabela = self.buscar_na_tabela_de_simbolos(
                                                 tabelaNoIndiceAtual[5][3][n], 3)
                                             if(varDeclaradaNaTabela != None):
                                                 if (varDeclaradaNaTabela[0] <= tabelaNoIndiceAtual[0]
@@ -2182,7 +2102,7 @@ class Parser:
 
 
             if simbolo.isalpha() and simbolo != 'True' and simbolo != 'False':
-                varDeclarada = self.buscarNaTabelaDeSimbolos(
+                varDeclarada = self.buscar_na_tabela_de_simbolos(
                     tabelaNoIndiceAtual[5][0], 3
                 )
                 if varDeclarada != None:
@@ -2237,14 +2157,6 @@ class Parser:
                                 self.tabelaDeSimbolos[k], simbolo)
                             break
 
-            # elif self.buscarParamsProc(simbolo) == True:
-            #     flag = True
-            #     break
-
-            # elif self.buscarParamsFunc(simbolo, 3) == True:
-            #     flag = True
-            #     break
-
         if flag == False:
             raise Exception(
                 f'Erro Semântico: variável "{simbolo[3]}" não declarada neste escopo, linha: ' +
@@ -2270,14 +2182,6 @@ class Parser:
                                 context[k], simbolo, func_context=context)
                             break
 
-            # elif self.buscarParamsProc(simbolo) == True:
-            #     flag = True
-            #     break
-
-            # elif self.buscarParamsFunc(simbolo, 3) == True:
-            #     flag = True
-            #     break
-
         if flag == False:
             raise Exception(
                 "Erro Semântico: variável não declarada na linha: " +
@@ -2285,7 +2189,7 @@ class Parser:
             )
 
     def buscarParamsProc(self, simbolo):
-        paramsProc = self.buscarNaTabelaDeSimbolos("token615_proc", 2)
+        paramsProc = self.buscar_na_tabela_de_simbolos("token615_proc", 2)
         if paramsProc != None:
             paramsProc = paramsProc[5]
             for k in range(len(paramsProc)):
@@ -2311,7 +2215,7 @@ class Parser:
             return False
 
     def buscarParamsFunc(self, simbolo, n):
-        paramsFunc = self.buscarNaTabelaDeSimbolos("token602_func", 2)
+        paramsFunc = self.buscar_na_tabela_de_simbolos("token602_func", 2)
         if paramsFunc != None:
             paramsFunc = paramsFunc[5]
             for k in range(len(paramsFunc)):
@@ -2456,7 +2360,7 @@ class Parser:
     def comparaTipoChamadaComDeclaracao(
         self, declaracaoVarNaTabela, callFuncTabela, tipo, n
     ):
-        declaracaoFuncNaTabela = self.buscarNaTabelaDeSimbolos(tipo, 2)
+        declaracaoFuncNaTabela = self.buscar_na_tabela_de_simbolos(tipo, 2)
         flag = False
         for k in range(len(declaracaoFuncNaTabela[n])):
             if declaracaoFuncNaTabela[n][k][1] == declaracaoVarNaTabela[2]:
@@ -2465,8 +2369,8 @@ class Parser:
 
 
             elif declaracaoVarNaTabela[2] == "token500_Id":
-                tipoDeclaracaoDoID = self.buscarNaTabelaDeSimbolos("token500_Id", 2)
-                varDeclarada = self.buscarNaTabelaDeSimbolos(
+                tipoDeclaracaoDoID = self.buscar_na_tabela_de_simbolos("token500_Id", 2)
+                varDeclarada = self.buscar_na_tabela_de_simbolos(
                     tipoDeclaracaoDoID[3], 3)
                 if declaracaoFuncNaTabela[n][k][1] == varDeclarada[2]:
                     flag = True
@@ -2520,9 +2424,9 @@ class Parser:
             )
 
     def expression_semantico(self, tabelaNoIndiceAtual):
-        buscaParam1 = self.buscarNaTabelaDeSimbolos(
+        buscaParam1 = self.buscar_na_tabela_de_simbolos(
             tabelaNoIndiceAtual[3][0], 3)
-        buscaParam2 = self.buscarNaTabelaDeSimbolos(
+        buscaParam2 = self.buscar_na_tabela_de_simbolos(
             tabelaNoIndiceAtual[3][2], 3)
 
         if (tabelaNoIndiceAtual[3][0]).isnumeric() and (
@@ -2645,13 +2549,13 @@ class Parser:
                 + str(tabelaNoIndiceAtual[1])
             )
 
-    def salvarValores(self, lista, contador):
+    def salvar_valores(self, lista, contador):
         if(contador < len(lista)):
             self.tabelaDeTresEnderecos.append(("temp"+str(self.tempAtualTresEnd)  + " := " "temp"+str(self.tempAtualTresEnd-1) + lista[contador] + lista[contador+1]))
             self.tempAtualTresEnd += 1
             contador += 2
             if(contador < len(lista) + 2):
-                self.salvarValores(lista, contador)
+                self.salvar_valores(lista, contador)
     
     def deriva_atribuicao(self, simboloDeclaradoNaTabela, simbolo, func_context=False):
         is_func_call = False
@@ -2703,21 +2607,6 @@ class Parser:
                                 )
                 elif type(s) is list:
                     continue
-                    for index, param in enumerate(is_func_call[5]):
-                        if param[1] == TOKEN_INT:
-                            if not s[index].isnumeric():
-                                raise Exception(
-                                    f'Erro semântico: Valor {s[index]} não suportado no {index}º parâmetro da função {is_func_call[4]}, linha '
-                                    + str(simbolo[i])
-                                )
-                        elif param[1] == TOKEN_BOOL:
-                            if s[index] not in (LEX_TRUE, LEX_FALSE):
-                                raise Exception(
-                                    f'Erro semântico: Valor {s[index]} não suportado no {index}º parâmetro da função {is_func_call[4]}, linha '
-                                    + str(simbolo[i])
-                                )
-                    is_func_call = False
-
 
             elif simboloDeclaradoNaTabela[2] == TOKEN_BOOL:
                 if s in (LEX_TRUE, LEX_FALSE):

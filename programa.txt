@@ -13,7 +13,7 @@ main {
         return True;
     }endfunc
 
-    proc p1(int t, int t2){
+    proc p1(int t1, int t2){
         print(t1);
     }endproc
 
