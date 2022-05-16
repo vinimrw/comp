@@ -1,16 +1,14 @@
 main {
 
     int i;
+    int j;
+    j = 1;
     bool b;
-    i = 1;
     b = True;
+    i = 1 + 2 * 4 / 5 + j;
     
     func int f1(int t1, int t2){
         return t1;
-    }endfunc
-
-    func bool f2(bool t1, bool t2){
-        return True;
     }endfunc
 
     proc p1(int t1, int t2){
@@ -19,14 +17,23 @@ main {
 
     int cont;
     cont = 0;
-    while(cont < 10){
+    while(cont > 1){
         if(cont == 5){
             cont = 3;
+            break;
+            cont = 5;
         }endif
         else{
             continue;
         }endelse
     }endwhile
+
+    if(cont == 5){
+        cont = 3;
+    }endif
+    else{
+        cont = 4;
+    }endelse
 
     int teste1;
     teste1 = call f1(2, 1);
