@@ -22,12 +22,6 @@ if __name__ == "__main__":
         tabelaDeTokens = lexer.scan()
 
         parser = Parser(tabelaDeTokens)
-
-        print("#============================#\n")
-        print("#       TABELA DE TOKENS     #\n")
-        for i in tabelaDeTokens:
-            print(i)
-        print("#============================#\n")
     
         parser.start()
         print("#============================#\n")
