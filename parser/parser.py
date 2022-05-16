@@ -239,7 +239,7 @@ class Parser:
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta de token615_proc ou token602_func"
+                    "Erro sintatico: falta de proc ou func na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -264,7 +264,7 @@ class Parser:
 
         if self.token_atual().tipo == "token606_else":
             raise Exception(
-                "Erro sintatico: token606_else adicionado de maneira incorreta "
+                "Erro sintatico: else adicionado de maneira incorreta "
                 + str(self.token_atual().linha)
             )
 
@@ -349,7 +349,7 @@ class Parser:
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta de token615_proc ou token602_func"
+                    "Erro sintatico: falta de proc ou func na linha"
                     + str(self.token_atual().linha)
                 )
 
@@ -373,7 +373,7 @@ class Parser:
 
         if self.token_atual().tipo == "token606_else":
             raise Exception(
-                "Erro sintatico: token606_else adicionado de maneira incorreta "
+                "Erro sintatico: else adicionado de maneira incorreta "
                 + str(self.token_atual().linha)
             )
 
@@ -406,7 +406,7 @@ class Parser:
         if self.token_atual().tipo == "token500_Id":
             temp.append(self.token_atual().lexema)
             self.indexDaTabelaDeTokens += 1
-            if self.token_atual().tipo == "token111_=" and is_attribution:  # Tratar aqui para não permitir ou permitir atribuicao na declaracao
+            if self.token_atual().tipo == "token111_=" and is_attribution:  
                 temp.append(self.token_atual().lexema)
                 self.indexDaTabelaDeTokens += 1
                 temp.append([])
@@ -775,7 +775,7 @@ class Parser:
                 return
             else:
                 raise Exception(
-                    "Erro sintatico: token611_boolValue atribuido erroneamente na linha "
+                    "Erro sintatico: Valor Booleano atribuido erroneamente na linha "
                     + str(self.token_atual().linha)
                 )
         if self.token_atual().tipo == "token300_Num":
@@ -829,7 +829,7 @@ class Parser:
             ):
                 temp.append(self.token_atual().lexema)
                 self.indexDaTabelaDeTokens += 1
-                if self.token_atual().tipo == "token200_;": # Adicionar operação aritmetica aqui
+                if self.token_atual().tipo == "token200_;": 
                     self.indexDaTabelaDeTokens += 1
                     if not context:
                         self.tabelaDeSimbolos.append(temp)
@@ -1067,7 +1067,7 @@ class Parser:
                                 )
                         else:
                             raise Exception(
-                                "Erro sintatico: falta o token500_Id na linha "
+                                "Erro sintatico: falta o ID na linha "
                                 + str(self.token_atual().linha)
                             )
 
@@ -1160,7 +1160,7 @@ class Parser:
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do token500_Id na linha "
+                    "Erro sintatico: falta do ID na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -1565,7 +1565,7 @@ class Parser:
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do token500_Id na linha " +
+                "Erro sintatico: falta do ID na linha " +
                 str(self.token_atual().linha)
             )
 
@@ -1891,17 +1891,17 @@ class Parser:
                                 return
                         else:
                             raise Exception(
-                                "Erro sintatico: falta de token605_endif "
+                                "Erro sintatico: falta de endif na linha "
                                 + str(self.token_atual().linha)
                             )
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do token205_} na linha "
+                            "Erro sintatico: falta do } na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do token204_{ ou bloco vazio na linha "
+                        "Erro sintatico: falta do { ou bloco vazio na linha "
                         + str(self.token_atual().linha)
                     )
             else:
@@ -1941,12 +1941,12 @@ class Parser:
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do token205_} na linha "
+                    "Erro sintatico: falta do } na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do token204_{ ou bloco vazio na linha "
+                "Erro sintatico: falta do { ou bloco vazio na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -1995,17 +1995,17 @@ class Parser:
                                 return
                         else:
                             raise Exception(
-                                "Erro sintatico: falta de token605_endif "
+                                "Erro sintatico: falta de endif na linha "
                                 + str(self.token_atual().linha)
                             )
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do token205_} na linha "
+                            "Erro sintatico: falta do } na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do token204_{ ou Bloco vazio na linha "
+                        "Erro sintatico: falta do { ou Bloco vazio na linha "
                         + str(self.token_atual().linha)
                     )
             else:
@@ -2040,17 +2040,17 @@ class Parser:
                     return tempElse
                 else:
                     raise Exception(
-                        "Erro sintatico: falta de token606_endelse na linha "
+                        "Erro sintatico: falta de endelse na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do token205_} na linha "
+                    "Erro sintatico: falta do } na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do token204_{ ou bloco vazio na linha "
+                "Erro sintatico: falta do { ou bloco vazio na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -2085,27 +2085,27 @@ class Parser:
                             self.indexEscopoAtual -= 1
                         else:
                             raise Exception(
-                                "Erro sintatico: falta de token607_endwhile na linha "
+                                "Erro sintatico: falta de endwhile na linha "
                                 + str(self.token_atual().linha)
                             )
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do token205_} na linha "
+                            "Erro sintatico: falta do } na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do token204_{ na linha "
+                        "Erro sintatico: falta do { na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do token203_) na linha "
+                    "Erro sintatico: falta do ) na linha "
                     + str(self.token_atual().linha)
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do token202_( na linha "
+                "Erro sintatico: falta do ( na linha "
                 + str(self.token_atual().linha)
             )
 
@@ -2152,7 +2152,7 @@ class Parser:
                     return tempExpression
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do token500_Id na linha "
+                        "Erro sintatico: falta do Id na linha "
                         + str(self.token_atual().linha)
                     )
             else:
@@ -2162,7 +2162,7 @@ class Parser:
                 )
         else:
             raise Exception(
-                "Erro sintatico: falta do token500_Id na linha " +
+                "Erro sintatico: falta do ID na linha " +
                 str(self.token_atual().linha)
             )
 
@@ -2185,7 +2185,7 @@ class Parser:
                 return
         else:
             raise Exception(
-                "Erro sintatico: falta do token500_Id na linha " +
+                "Erro sintatico: falta do ID na linha " +
                 str(self.token_atual().linha)
             )
 
@@ -2358,7 +2358,7 @@ class Parser:
                             return True
                         else:
                             raise Exception(
-                                "Erro Semântico: variável do tipo token609_int não recebe token609_int na linha: "
+                                "Erro Semântico: variável do tipo int não recebe inteiro na linha: "
                                 + str(tabelaNoIndiceAtual[1])
                             )
                     else:
@@ -2386,7 +2386,7 @@ class Parser:
 
             if simbolo.isnumeric():
                 raise Exception(
-                    "Erro Semântico: variável do tipo token611_boolValue não recebe token611_boolValue na linha: "
+                    "Erro Semântico: variável do tipo bool não recebe boolean na linha: "
                     + str(tabelaNoIndiceAtual[1])
                 )
 
@@ -2417,7 +2417,7 @@ class Parser:
                                                             return True
                                                         else:
                                                             raise Exception(
-                                                                "Erro Semântico: token611_boolValue não recebe token611_boolValue na linha: "
+                                                                "Erro Semântico: bool não recebe boolean na linha: "
                                                                 + str(tabelaNoIndiceAtual[1])
                                                             )
                                                     else:
@@ -2472,12 +2472,12 @@ class Parser:
                                 return True
                             else:
                                 raise Exception(
-                                    "Erro Semântico: variável do tipo token611_boolValue não recebe token611_boolValue na linha: "
+                                    "Erro Semântico: variável do tipo bool não recebe boolean na linha: "
                                     + str(tabelaNoIndiceAtual[1])
                                 )
                         else:
                             raise Exception(
-                                "Erro Semântico: variável do tipo token611_boolValue não recebe token611_boolValue na linha: "
+                                "Erro Semântico: variável do tipo bool não recebe boolean na linha: "
                                 + str(tabelaNoIndiceAtual[1])
                             )
                     else:
@@ -2493,7 +2493,7 @@ class Parser:
 
             else:
                 raise Exception(
-                    "Erro Semântico: variável do tipo token611_boolValue não recebe token611_boolValue na linha: "
+                    "Erro Semântico: variável do tipo bool não recebe boolean na linha: "
                     + str(tabelaNoIndiceAtual[1])
                 )
 
@@ -2572,7 +2572,7 @@ class Parser:
                             return True
                         if not simbolo[5].isnumeric():
                             raise Exception(
-                                "Erro Semântico: variável do tipo token609_int não recebe token609_int na linha: "
+                                "Erro Semântico: variável do tipo int não recebe inteiro na linha: "
                                 + str(simbolo[1])
                             )
                     if paramsProc[k][1] == "token610_bool":
@@ -2598,7 +2598,7 @@ class Parser:
                             return True
                         if not simbolo[5].isnumeric():
                             raise Exception(
-                                "Erro Semântico: variável do tipo token609_int não recebe token609_int na linha: "
+                                "Erro Semântico: variável do tipo int não recebe inteiro na linha: "
                                 + str(simbolo[1])
                             )
                     if paramsFunc[k][1] == "token610_bool":
@@ -2695,14 +2695,6 @@ class Parser:
     def verificarParams(
         self, simboloDeclaradoNaTabela, simbolo, n, tipo, m, linha, escopo
     ):
-        # PASSO A PASSO:
-        # 1º -> Verificar quantidade de parametros de acordo com a declaração
-        # 2º -> Se for > 0
-        # Devemos percorrer cada variavel dos parametros, então verificar em cada um o seguinte:
-        # 1º -> Verificar se já foi declarada no escopo visível ok
-        # 2º -> Verificar se o tipo na chamada é o mesmo da declaração ok
-        # 3º -> Se for sem params, prosseguir
-
         flag = 0
         if len(simboloDeclaradoNaTabela[n]) == len(simbolo[m]):
             if len(simbolo[m]) > 0:
@@ -2852,7 +2844,7 @@ class Parser:
                             return True
                         else:
                             raise Exception(
-                                "Erro Semântico: Não é possível fazer este tipo de comparação com token611_boolValue na linha: "
+                                "Erro Semântico: Não é possível fazer este tipo de comparação com booleano na linha: "
                                 + str(tabelaNoIndiceAtual[1])
                             )
                     else:

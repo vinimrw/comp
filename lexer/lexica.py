@@ -19,7 +19,7 @@ class Scanner:
 
     def nextChar(self):
         self.atual += 1
-        return self.programa[self.atual - 1]  #
+        return self.programa[self.atual - 1] 
 
     def scan(self):
         self.scanTokens()
