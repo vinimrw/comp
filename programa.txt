@@ -21,7 +21,7 @@ main {
     cont = 0;
     while(cont < 10){
         if(cont == 5){
-            break;
+            cont = 3;
         }endif
         else{
             continue;

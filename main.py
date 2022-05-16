@@ -6,7 +6,7 @@ from pprint import pprint
 import sys
 
 if __name__ == "__main__":
-    caminho = "programa.txt"
+    caminho = "programa2.txt"
 
     try:
         arquivo = open(caminho, "r")

@@ -283,7 +283,7 @@ class Parser:
             )
 
     # é o que só pode ser chamado dentro de um if
-    def block_escopo_if(self, context=False, is_while=False):
+    def block_escopo_if(self, context=False, is_while=False, is_if = False):
 
         if self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool":
             temp = []
@@ -373,7 +373,7 @@ class Parser:
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
             temp.append(self.token_atual().lexema)
-            self.call_var_escopo_main(temp)
+            self.call_var_escopo_main(temp, is_if = is_if)
             return temp
 
         if is_while and (self.token_atual().tipo == "token613_break" or self.token_atual().tipo == "token614_cont"):
@@ -690,7 +690,7 @@ class Parser:
     def salvar_if_tres_enderecos(self, dados, is_while=False, whilename=False, endwhilename = False):
         self.tabelaDeTresEnderecos.append((
             f'temp{self.tempAtualTresEnd}: if {dados[3][0]} {self.inverter_relacional(dados[3][1])} {dados[3][2]}'
-            + f' goto temp{self.tempAtualTresEnd+2 if (len(dados) == 7 and dados[6][1] == TOKEN_ELSE) else self.tempAtualTresEnd+1 }'
+            + f' goto temp{self.tempAtualTresEnd+2 if (dados[6] and dados[6][1] == TOKEN_ELSE) else self.tempAtualTresEnd+1 }'
         ))
         self.tempAtualTresEnd += 1
 
@@ -714,7 +714,7 @@ class Parser:
                 self.tempAtualTresEnd += 1
                 self.salvar_if_tres_enderecos(i)
         
-        if (len(dados) == 7
+        if (dados[6]
             and  dados[6][1] == TOKEN_ELSE
         ):
             self.tabelaDeTresEnderecos.append(
@@ -781,12 +781,13 @@ class Parser:
             self.tabelaDeTresEnderecos.append((dados[3] + ' := ' + dados[5][0]))
 
 
-    def atrib_var_escopo_main(self, temp):
+    def atrib_var_escopo_main(self, temp, is_if = False):
         tempEndVar = temp[5]
         if self.token_atual().tipo == "token604_call":
             tempEndVar.append(self.token_atual().tipo)
             self.call_func_escopo_main(tempEndVar)
-            self.salvar_variaveis_tres_endereco(temp)
+            if not is_if:
+                self.salvar_variaveis_tres_endereco(temp)
             return
 
         if self.token_atual().tipo == "token611_boolValue":
@@ -797,7 +798,8 @@ class Parser:
             ):
                 tempEndVar.append(self.token_atual().lexema)
                 self.indexDaTabelaDeTokens += 1
-                self.salvar_variaveis_tres_endereco(temp)
+                if not is_if:
+                    self.salvar_variaveis_tres_endereco(temp)
                 return
             else:
                 raise Exception(
@@ -815,9 +817,11 @@ class Parser:
             ):
                 tempEndVar.append(self.token_atual().lexema)
                 self.call_op_escopo_main(tempEndVar)
-                self.salvar_variaveis_tres_endereco(temp)
+                if not is_if:
+                    self.salvar_variaveis_tres_endereco(temp)
             elif self.token_atual().tipo == TOKEN_PONTOVIRGULA:
-                self.salvar_variaveis_tres_endereco(temp)
+                if not is_if:
+                    self.salvar_variaveis_tres_endereco(temp)
             return
 
         if self.token_atual().tipo == "token500_Id":
@@ -831,10 +835,12 @@ class Parser:
             ):
                 tempEndVar.append(self.token_atual().lexema)
                 self.call_op_escopo_main(tempEndVar)
-                self.salvar_variaveis_tres_endereco(temp)
+                if not is_if:
+                    self.salvar_variaveis_tres_endereco(temp)
                 return
             elif self.token_atual().tipo == TOKEN_PONTOVIRGULA:
-                self.salvar_variaveis_tres_endereco(temp)
+                if not is_if:
+                    self.salvar_variaveis_tres_endereco(temp)
                 return
         else:
             raise Exception(
@@ -843,13 +849,13 @@ class Parser:
             )
 
 
-    def call_var_escopo_main(self, temp, context = False):
+    def call_var_escopo_main(self, temp, context = False, is_if=False):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token111_=":  
             temp.append(self.token_atual().lexema)
             self.indexDaTabelaDeTokens += 1
             temp.append([])
-            self.atrib_var_escopo_main(temp)
+            self.atrib_var_escopo_main(temp, is_if=is_if)
 
             if self.token_atual().tipo == "token200_;":
                 self.indexDaTabelaDeTokens += 1
@@ -1508,7 +1514,7 @@ class Parser:
                         self.token_atual().tipo != "token205_}"
                         and self.token_look_ahead().tipo != "token605_endif"
                     ):
-                        tempBlock.append(self.block_escopo_if(context=context, is_while=False))
+                        tempBlock.append(self.block_escopo_if(context=context, is_while=False, is_if=True))
 
                     temp.append(tempBlock)
                     if self.token_atual().tipo == "token205_}":
@@ -1571,7 +1577,7 @@ class Parser:
                 self.token_atual().tipo != "token205_}"
                 and self.token_look_ahead().tipo != "token606_endelse"
             ):
-                tempBlock.append(self.block_escopo_if(context=context))
+                tempBlock.append(self.block_escopo_if(context=context, is_if=True))
             tempElse.append(tempBlock)
             if self.token_atual().tipo == "token205_}":
                 self.indexDaTabelaDeTokens += 1
