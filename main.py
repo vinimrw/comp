@@ -26,7 +26,7 @@ if __name__ == "__main__":
         parser.start()
         print("#============================#\n")
         print("#     TABELA DE SÍMBOLOS     #\n")
-        pprint(parser.tabelaDeSimbolos)
+        print(parser.tabelaDeSimbolos)
         print("#============================#\n")
     
         print("#============================#\n")
