@@ -4,42 +4,6 @@ from lexemas import LEX_DIFERENTE, LEX_DIV, LEX_FALSE, LEX_IGUAL, LEX_MAIOR, LEX
 from tokens import TOKEN_ABRE_PARENTESES, TOKEN_BOOL, TOKEN_BREAK, TOKEN_CALL, TOKEN_CONTINUE, TOKEN_DIFERENTE, TOKEN_DIV, TOKEN_FECHA_CHAVES, TOKEN_FECHA_PARENTESES, TOKEN_ID, TOKEN_IGUAL, TOKEN_INT, TOKEN_MAIOR, TOKEN_MAIORIGUAL, TOKEN_MENOR, TOKEN_MENORIGUAL, TOKEN_MULT, TOKEN_NUM, TOKEN_PONTOVIRGULA, TOKEN_PROC, TOKEN_SOMA, TOKEN_SUB, TOKEN_TRUEFALSE, TOKEN_WHILE
 
 
-def arvoreExpressao(lista):
-    if(lista == None or len(lista) == 0):
-        return []
-    else:
-        listaPrimeiro = lista[0]
-        if (len(lista) == 1):
-            return [listaPrimeiro]
-
-        listaSegundo = lista[1]
-        listaTerceiro = arvoreExpressao(lista[2:])
-        return ([listaPrimeiro] + [listaSegundo] + [listaTerceiro])
-
-
-def expressaoTresEnderecos(lista):
-    listaTresEnd = []
-
-    if(lista == None or len(lista) == 0):
-        return listaTresEnd
-
-    primeiraVariavel = lista[0]
-    if (len(lista) == 1):
-        listaTresEnd.append(('mov', 'temp', primeiraVariavel))
-
-    else:
-        operacao = lista[1]
-        resto = expressaoTresEnderecos(lista[2])
-        listaTresEnd.extend(resto)
-
-        if(operacao == "+"):
-            listaTresEnd.append(('token101_+', 'temp', primeiraVariavel))
-
-        if(operacao == "*"):
-            listaTresEnd.append(('mul', 'temp', primeiraVariavel))
-
-    return listaTresEnd
-
 class Parser:
     def __init__(self, tabelaDeTokens):
         self.tabelaDeTokens = tabelaDeTokens
@@ -64,36 +28,36 @@ class Parser:
     def start(self):
         escopoPai = self.indexEscopoAtual  
         self.indexEscopoAtual += 1
-        self.statement_list()  
+        self.escopo()  
 
-        for linha in self.tabelaDeTresEnderecos:
-           pprint(linha)
-        print('\n')
+        #for linha in self.tabelaDeTresEnderecos:
+        #   pprint(linha)
+        #print('\n')
 
         self.checkSemantica()
         return
 
-    def statement_list(self):
-        if self.token_atual().tipo == "token601_end":
+    def escopo(self):
+        if self.token_atual().tipo == "token601_endmain":
             return
         else:
-            self.statement()
-            self.statement_list()
+            self.escopo_main()
+            self.escopo()
             return
 
-    def statement(self):
+    def escopo_main(self):
         if self.token_atual().tipo == "token600_main":
             self.indexDaTabelaDeTokens += 1
             if self.token_atual().tipo == "token204_{":
                 self.indexDaTabelaDeTokens += 1
 
                 while self.token_atual().tipo != "token205_}":
-                    self.block_statement()
+                    self.block_escopo_main()
 
                 if self.token_atual().tipo == "token205_}":
                     self.indexDaTabelaDeTokens += 1
 
-                    if self.token_atual().tipo == "token601_end":
+                    if self.token_atual().tipo == "token601_endmain":
                         print("#============================#\n")
                         print("#  FIM DA ANÁLISE SINTÁTICA  #\n")
                         print("#  FINALIZADO SEM PROBLEMAS  #\n")
@@ -103,17 +67,17 @@ class Parser:
                         )                     
                     else:
                         raise Exception(
-                            "Erro sintatico: falta do token601_end na linha "
+                            "Erro sintatico: falta do endmain na linha "
                             + str(self.token_atual().linha)
                         )
                 else:
                     raise Exception(
-                        "Erro sintatico: falta do token205_} na linha "
+                        "Erro sintatico: falta do } na linha "
                         + str(self.token_atual().linha)
                     )
             else:
                 raise Exception(
-                    "Erro sintatico: falta do token204_{ na linha "
+                    "Erro sintatico: falta do { na linha "
                     + str(self.token_atual().linha)
                 )
         else:
@@ -122,13 +86,13 @@ class Parser:
                 + str(self.token_atual().linha)
             )
 
-    def block_statement(self, context = False, is_while: bool = False, is_if: bool = False, is_proc: bool = False):
+    def block_escopo_main(self, context = False, is_while: bool = False, is_if: bool = False, is_proc: bool = False):
         if self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool":
             temp = []
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.declaration_var_statement(temp, context=context)
+            self.declaration_var_escopo_main(temp, context=context)
             return temp
 
         if self.token_atual().tipo == "token602_func":
@@ -137,7 +101,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.declaration_func_statement(temp)
+            self.func_declar(temp)
             return temp
 
         if self.token_atual().tipo == "token615_proc":
@@ -145,7 +109,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.declaration_proc_statement(temp)
+            self.proc_declar(temp)
             return temp
 
         if self.token_atual().tipo == "token604_call":
@@ -154,7 +118,7 @@ class Parser:
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
             self.indexDaTabelaDeTokens += 1
-            temp = self.call_proc_statement(temp)
+            temp = self.call_proc_escopo_main(temp)
     
             if self.token_atual().tipo == "token200_;":
                 self.salvar_call_proc_tres_enderecos(temp)
@@ -164,7 +128,7 @@ class Parser:
                 return temp
             else:
                 raise Exception(
-                    "aErro sintatico: falta do ponto e virgula na linha "
+                    "Erro sintatico: falta do ponto e virgula na linha "
                     + str(self.token_atual().linha)
                 )
 
@@ -173,7 +137,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.print_statement(temp)
+            self.print_escopo_main(temp)
             return temp
 
 
@@ -183,7 +147,7 @@ class Parser:
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
             if is_while:
-                self.ifStatementWhile(temp, is_proc)
+                self.if_escopo_While(temp, is_proc)
 
                 condicao = temp[3]
                 params = ''
@@ -197,7 +161,7 @@ class Parser:
                 self.tempAtualIfTresEnd += 1
                 return temp
             else:
-                self.if_statement(temp)
+                self.if_escopo_main(temp)
                 self.salvar_if_tres_enderecos(temp)
                 return temp
 
@@ -207,19 +171,19 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.while_statement(temp)
+            self.while_escopo_main(temp)
             self.salvar_while_tres_enderecos(temp)
             return temp
 
 
-        if self.token_atual().tipo == "token500_Id": # Tratar aqui assim como é tratado quando ele acha Int ou bool
+        if self.token_atual().tipo == "token500_Id": 
             temp = []
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
             # temp.append(self.token_atual().lexema)
-            self.declaration_var_statement(temp, is_attribution=True, context=context)
-            # self.call_var_statement(temp)
+            self.declaration_var_escopo_main(temp, is_attribution=True, context=context)
+            # self.call_var_escopo_main(temp)
             return temp
 
         else:
@@ -227,15 +191,15 @@ class Parser:
                 f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual'
             )
 
-    # block2 é o bloco que contém break/continue que só pode ser chamado dentro de um while
-    def block2_statement(self, context = True):
+    # o bloco que contém break/continue que só pode ser chamado dentro de um while
+    def block_escopo_while(self, context = True):
 
         if self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool":
             temp = []
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.declaration_var_statement(temp)
+            self.declaration_var_escopo_main(temp)
             return temp
 
 
@@ -248,7 +212,7 @@ class Parser:
 
             if self.token_atual().tipo == "token602_func":
                 temp.append(self.token_atual().tipo)
-                temp = self.call_func_statement(temp)
+                temp = self.call_func_escopo_main(temp)
                 if self.token_atual().tipo == "token200_;":
                     if not context:
                         self.tabelaDeSimbolos.append(temp)
@@ -262,7 +226,7 @@ class Parser:
 
             elif self.token_atual().tipo == "token615_proc":
                 temp.append(self.token_atual().tipo)
-                temp = self.call_proc_statement(temp)
+                temp = self.call_proc_escopo_main(temp)
                 if self.token_atual().tipo == "token200_;":
                     if not context:
                         self.tabelaDeSimbolos.append(temp)
@@ -285,7 +249,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.print_statement(temp)
+            self.print_escopo_main(temp)
             return temp
 
 
@@ -294,7 +258,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.if_statement2(temp, context)
+            self.if_escopo_main_flow(temp, context)
             return temp
 
 
@@ -310,7 +274,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.while_statement(temp)
+            self.while_escopo_main(temp)
             return temp
 
 
@@ -320,7 +284,7 @@ class Parser:
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
             temp.append(self.token_atual().lexema)
-            self.call_var_statement(temp)
+            self.call_var_escopo_main(temp)
             return temp
 
  
@@ -329,7 +293,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.unconditional_branch_statement()
+            self.statement_flow()
             return temp
 
         else:
@@ -337,15 +301,15 @@ class Parser:
                 f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual'
             )
 
-    # block2 é o que só pode ser chamado dentro de um if
-    def block3_statement(self, context=False):
+    # é o que só pode ser chamado dentro de um if
+    def block_escopo_if(self, context=False):
 
         if self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool":
             temp = []
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.declaration_var_statement(temp)
+            self.declaration_var_escopo_main(temp)
             return temp
 
 
@@ -358,7 +322,7 @@ class Parser:
 
             if self.token_atual().tipo == "token602_func":
                 temp.append(self.token_atual().tipo)
-                temp = self.call_func_statement(temp)
+                temp = self.call_func_escopo_main(temp)
                 if self.token_atual().tipo == "token200_;":
                     if not context:
                         self.tabelaDeSimbolos.append(temp)
@@ -372,7 +336,7 @@ class Parser:
 
             elif self.token_atual().tipo == "token615_proc":
                 temp.append(self.token_atual().tipo)
-                temp = self.call_proc_statement(temp)
+                temp = self.call_proc_escopo_main(temp)
                 if self.token_atual().tipo == "token200_;":
                     if not context:
                         self.tabelaDeSimbolos.append(temp)
@@ -395,7 +359,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.print_statement(temp)
+            self.print_escopo_main(temp)
             return temp
 
 
@@ -404,7 +368,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.if_statement(temp, context=True)
+            self.if_escopo_main(temp, context=True)
             return temp
 
         if self.token_atual().tipo == "token606_else":
@@ -418,7 +382,7 @@ class Parser:
             temp.append(self.indexEscopoAtual)
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
-            self.while_statement(temp)
+            self.while_escopo_main(temp)
             return temp
 
   
@@ -428,7 +392,7 @@ class Parser:
             temp.append(self.token_atual().linha)
             temp.append(self.token_atual().tipo)
             temp.append(self.token_atual().lexema)
-            self.call_var_statement(temp, context=True)
+            self.call_var_escopo_main(temp, context=True)
             return temp
 
         else:
@@ -436,7 +400,7 @@ class Parser:
                 f'Erro sintático: Token {self.token_atual().lexema} não é válido no escopo atual'
             )
 
-    def declaration_var_statement(self, temp, is_attribution = False, context = False):
+    def declaration_var_escopo_main(self, temp, is_attribution = False, context = False):
         if not is_attribution:
             self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token500_Id":
@@ -446,7 +410,7 @@ class Parser:
                 temp.append(self.token_atual().lexema)
                 self.indexDaTabelaDeTokens += 1
                 temp.append([])
-                self.end_var_statement(temp)
+                self.atrib_var_escopo_main(temp)
 
                 if self.token_atual().tipo == "token200_;":
                     self.indexDaTabelaDeTokens += 1
@@ -791,11 +755,11 @@ class Parser:
             self.tabelaDeTresEnderecos.append((dados[3] + ' := ' + dados[5][0]))
 
 
-    def end_var_statement(self, temp):
+    def atrib_var_escopo_main(self, temp):
         tempEndVar = temp[5]
         if self.token_atual().tipo == "token604_call":
             tempEndVar.append(self.token_atual().tipo)
-            self.call_func_statement(tempEndVar)
+            self.call_func_escopo_main(tempEndVar)
             self.salvar_variaveis_tres_endereco(temp)
             return
 
@@ -824,7 +788,7 @@ class Parser:
                 or self.token_atual().tipo == "token104_/"
             ):
                 tempEndVar.append(self.token_atual().lexema)
-                self.call_op_statement(tempEndVar)
+                self.call_op_escopo_main(tempEndVar)
                 self.salvar_variaveis_tres_endereco(temp)
             elif self.token_atual().tipo == TOKEN_PONTOVIRGULA:
                 self.salvar_variaveis_tres_endereco(temp)
@@ -840,7 +804,7 @@ class Parser:
                 or self.token_atual().tipo == "token104_/"
             ):
                 tempEndVar.append(self.token_atual().lexema)
-                self.call_op_statement(tempEndVar)
+                self.call_op_escopo_main(tempEndVar)
                 self.salvar_variaveis_tres_endereco(temp)
                 return
             elif self.token_atual().tipo == TOKEN_PONTOVIRGULA:
@@ -853,7 +817,7 @@ class Parser:
             )
 
 
-    def call_var_statement(self, temp, context = False):
+    def call_var_escopo_main(self, temp, context = False):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token111_=":  
             temp.append(self.token_atual().lexema)
@@ -886,7 +850,7 @@ class Parser:
             )
 
 
-    def declaration_func_statement(self, temp):
+    def func_declar(self, temp):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool":  
             temp.append(self.token_atual().tipo)
@@ -923,7 +887,7 @@ class Parser:
                             self.indexDaTabelaDeTokens += 1
                             if self.token_atual().tipo == "token201_,":
                     
-                                self.params_statement(tempParenteses)  
+                                self.params_declar(tempParenteses)  
                                 temp.append(tempParenteses)
                                 if self.token_atual().tipo == "token203_)":
                                     self.indexDaTabelaDeTokens += 1
@@ -950,7 +914,7 @@ class Parser:
                          
                                         while self.token_atual().tipo != "token603_return":
                                             tempBlock.append(
-                                                self.block_statement(context=True))
+                                                self.block_escopo_main(context=True))
 
                                         temp.append(tempBlock)
                                         tempReturn = []
@@ -964,7 +928,7 @@ class Parser:
                                                 self.token_atual().tipo)
                          
                                             tempReturnParams = []
-                                            tempReturnParams = self.return_statement(
+                                            tempReturnParams = self.return_declar(
                                                 tempReturnParams
                                             )
                                             tempReturn.append(tempReturnParams)
@@ -998,7 +962,7 @@ class Parser:
 
                                                 if (
                                                     self.token_atual().tipo
-                                                    == "token200_;"
+                                                    == "token602_endfunc"
                                                 ):
                                                     self.indexDaTabelaDeTokens += 1
                                                     self.tabelaDeSimbolos.append(temp)
@@ -1043,7 +1007,7 @@ class Parser:
                                         tempBlock = []
                                         while self.token_atual().tipo != "token603_return":
                                             tempBlock.append(
-                                                self.block_statement())
+                                                self.block_escopo_main())
 
                                         temp.append(tempBlock)
                                         tempReturn = []
@@ -1053,7 +1017,7 @@ class Parser:
                                             tempReturn.append(
                                                 self.token_atual().tipo)
                                             tempReturnParms = []
-                                            tempReturnParms = self.return_statement(
+                                            tempReturnParms = self.return_declar(
                                                 tempReturnParms
                                             )
                                             tempReturn.append(tempReturnParms)
@@ -1065,7 +1029,7 @@ class Parser:
                                                 self.indexDaTabelaDeTokens += 1
                                                 if (
                                                     self.token_atual().tipo
-                                                    == "token200_;"
+                                                    == "token602_endfunc"
                                                 ):
                                                     self.indexDaTabelaDeTokens += 1
                                                     self.tabelaDeSimbolos.append(
@@ -1137,7 +1101,7 @@ class Parser:
                                 tempBlock = []
               
                                 while self.token_atual().tipo != "token603_return":
-                                    tempBlock.append(self.block_statement())
+                                    tempBlock.append(self.block_escopo_main())
 
                                 temp.append(tempBlock)
 
@@ -1148,7 +1112,7 @@ class Parser:
                                     tempReturn.append(self.token_atual().tipo)
                           
                                     tempReturnParms = []
-                                    tempReturnParms = self.return_statement(
+                                    tempReturnParms = self.return_declar(
                                         tempReturnParms
                                     )
 
@@ -1159,7 +1123,7 @@ class Parser:
                                             self.indexEscopoAntesDaFuncao
                                         )
                                         self.indexDaTabelaDeTokens += 1
-                                        if self.token_atual().tipo == "token200_;":
+                                        if self.token_atual().tipo == "token602_endfunc":
                                             self.indexDaTabelaDeTokens += 1
                             
                                             self.tabelaDeSimbolos.append(temp)
@@ -1201,7 +1165,7 @@ class Parser:
                 )
 
 
-    def return_statement(self, tempReturnParams):
+    def return_declar(self, tempReturnParams):
         self.indexDaTabelaDeTokens += 1
 
   
@@ -1210,7 +1174,7 @@ class Parser:
             self.indexDaTabelaDeTokens += 1
             if self.token_atual().tipo == "token602_func":
                 tempReturnParams.append(self.token_atual().tipo)
-                self.call_func_statement(tempReturnParams)
+                self.call_func_escopo_main(tempReturnParams)
                 self.indexDaTabelaDeTokens += 1
                 return tempReturnParams
             else:
@@ -1244,7 +1208,7 @@ class Parser:
             )
 
 
-    def params_statement(self, tempParenteses):
+    def params_declar(self, tempParenteses):
     
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool":
@@ -1257,7 +1221,7 @@ class Parser:
                 tempParenteses.append(tempParentesesParamAtual)
                 self.indexDaTabelaDeTokens += 1
                 if self.token_atual().tipo == "token201_,":
-                    self.params_statement(tempParenteses)
+                    self.params_declar(tempParenteses)
                 elif (
                     self.token_atual().tipo == "token609_int" or self.token_atual().tipo == "token610_bool"
                 ):
@@ -1279,7 +1243,7 @@ class Parser:
             )
 
 
-    def declaration_proc_statement(self, temp):
+    def proc_declar(self, temp):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == TOKEN_ID:
             temp.append('void')
@@ -1313,7 +1277,7 @@ class Parser:
                         self.indexDaTabelaDeTokens += 1
                         if self.token_atual().tipo == "token201_,":
                 
-                            self.params_statement(tempParenteses)  
+                            self.params_declar(tempParenteses)  
                             temp.append(tempParenteses)
                             if self.token_atual().tipo == "token203_)":
                                 self.indexDaTabelaDeTokens += 1
@@ -1340,7 +1304,7 @@ class Parser:
                         
                                     while self.token_atual().tipo != TOKEN_FECHA_CHAVES:
                                         tempBlock.append(
-                                            self.block_statement(context=True))
+                                            self.block_escopo_main(context=True))
 
                                     temp.append(tempBlock)
                                     if self.token_atual().tipo == "token205_}":
@@ -1352,7 +1316,7 @@ class Parser:
 
                                         if (
                                             self.token_atual().tipo
-                                            == "token200_;"
+                                            == "token615_endproc"
                                         ):
                                             self.indexDaTabelaDeTokens += 1
                                             self.tabelaDeSimbolos.append(temp)
@@ -1392,7 +1356,7 @@ class Parser:
                                     tempBlock = []
                                     while self.token_atual().tipo != "token603_return":
                                         tempBlock.append(
-                                            self.block_statement())
+                                            self.block_escopo_main())
 
                                     temp.append(tempBlock)
                                     tempReturn = []
@@ -1402,7 +1366,7 @@ class Parser:
                                         tempReturn.append(
                                             self.token_atual().tipo)
                                         tempReturnParms = []
-                                        tempReturnParms = self.return_statement(
+                                        tempReturnParms = self.return_declar(
                                             tempReturnParms
                                         )
                                         tempReturn.append(tempReturnParms)
@@ -1414,7 +1378,7 @@ class Parser:
                                             self.indexDaTabelaDeTokens += 1
                                             if (
                                                 self.token_atual().tipo
-                                                == "token200_;"
+                                                == "token615_endproc"
                                             ):
                                                 self.indexDaTabelaDeTokens += 1
                                                 self.tabelaDeSimbolos.append(
@@ -1452,7 +1416,7 @@ class Parser:
                             )
                     else:
                         raise Exception(
-                            "Erro sintatico: falta o token500_Id na linha "
+                            "Erro sintatico: falta o Id na linha "
                             + str(self.token_atual().linha)
                         )
 
@@ -1486,7 +1450,7 @@ class Parser:
                             tempBlock = []
             
                             while self.token_atual().tipo != "token603_return":
-                                tempBlock.append(self.block_statement())
+                                tempBlock.append(self.block_escopo_main())
 
                             temp.append(tempBlock)
 
@@ -1497,7 +1461,7 @@ class Parser:
                                 tempReturn.append(self.token_atual().tipo)
                         
                                 tempReturnParms = []
-                                tempReturnParms = self.return_statement(
+                                tempReturnParms = self.return_declar(
                                     tempReturnParms
                                 )
 
@@ -1508,7 +1472,7 @@ class Parser:
                                         self.indexEscopoAntesDaFuncao
                                     )
                                     self.indexDaTabelaDeTokens += 1
-                                    if self.token_atual().tipo == "token200_;":
+                                    if self.token_atual().tipo == "token615_endproc":
                                         self.indexDaTabelaDeTokens += 1
                         
                                         self.tabelaDeSimbolos.append(temp)
@@ -1549,7 +1513,7 @@ class Parser:
                 str(self.token_atual().linha)
             )
 
-    def call_proc_statement(self, temp):
+    def call_proc_escopo_main(self, temp):
         if self.token_atual().tipo == "token500_Id":
             temp.append(self.token_atual().lexema)
             self.indexDaTabelaDeTokens += 1
@@ -1566,7 +1530,7 @@ class Parser:
                     self.indexDaTabelaDeTokens += 1
                     if self.token_atual().tipo == "token201_,":
                         tempParams.append(
-                            self.params_call_statement(tempParams))
+                            self.params_call_escopo_main(tempParams))
                         tempParams.pop()
                         temp.append(tempParams)
 
@@ -1606,7 +1570,7 @@ class Parser:
             )
 
 
-    def call_func_statement(self, temp):
+    def call_func_escopo_main(self, temp):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token500_Id":
             temp.append(self.token_atual().lexema)
@@ -1624,7 +1588,7 @@ class Parser:
                     self.indexDaTabelaDeTokens += 1
                     if self.token_atual().tipo == "token201_,":
                         tempParams.append(
-                            self.params_call_statement(tempParams))
+                            self.params_call_escopo_main(tempParams))
                         tempParams.pop()
                         if self.token_atual().tipo == "token203_)":
                             self.indexDaTabelaDeTokens += 1
@@ -1667,7 +1631,7 @@ class Parser:
                 str(self.token_atual().linha)
             )
 
-    def params_call_statement(self, tempParams):
+    def params_call_escopo_main(self, tempParams):
         self.indexDaTabelaDeTokens += 1
         if (
             self.token_atual().tipo == "token500_Id"
@@ -1678,7 +1642,7 @@ class Parser:
             tempParams.append(self.token_atual().lexema)
             self.indexDaTabelaDeTokens += 1
             if self.token_atual().tipo == "token201_,":
-                self.params_call_statement(tempParams)
+                self.params_call_escopo_main(tempParams)
             elif (
                 self.token_atual().tipo == "token500_Id"
                 or self.token_atual().lexema == "True"
@@ -1699,11 +1663,11 @@ class Parser:
             )
 
 
-    def print_statement(self, temp):
+    def print_escopo_main(self, temp):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token202_(":
             tempParams = []
-            temp.append(self.params_print_statement(tempParams))
+            temp.append(self.params_print_escopo_main(tempParams))
 
 
             self.tabelaDeTresEnderecos.append(
@@ -1732,14 +1696,14 @@ class Parser:
             )
 
 
-    def params_print_statement(self, tempParams):
+    def params_print_escopo_main(self, tempParams):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token604_call":
             tempParams.append(self.token_atual().tipo)
             self.indexDaTabelaDeTokens += 1
             if self.token_atual().tipo == "token602_func":
                 tempParams.append(self.token_atual().tipo)
-                tempParams = self.call_func_statement(tempParams)
+                tempParams = self.call_func_escopo_main(tempParams)
                 return tempParams
             elif self.token_atual().tipo == "token615_proc":
                 raise Exception(
@@ -1766,7 +1730,7 @@ class Parser:
                 or self.token_atual().tipo == "token104_/"
             ):
                 tempParams.append(self.token_atual().lexema)
-                self.call_op_statement(tempParams)
+                self.call_op_escopo_main(tempParams)
                 return tempParams
             else:
                 return tempParams
@@ -1776,7 +1740,7 @@ class Parser:
                 + str(self.token_atual().linha)
             )
 
-    def elsePartStatement(self, tempElse):
+    def else_escopo_while(self, tempElse):
     
         lookAhead = self.token_look_ahead()
         self.indexToken += 1
@@ -1784,7 +1748,7 @@ class Parser:
             self.indexToken += 1
             tempBlock = []
             while(self.token_atual().tipo != "token205_}" and self.tokenLookAhead().tipo != "token606_endelse"):         
-                tempBlock.append(self.block_statement(isIf=True))
+                tempBlock.append(self.block_escopo_main(isIf=True))
             if self.token_atual().tipo == "token205_}":
                 self.indexToken += 1
                 if self.token_atual().tipo == "token606_endelse":  
@@ -1807,12 +1771,12 @@ class Parser:
                 str(self.token_atual().linha)
             )   
 
-    def ifStatementWhile(self, temp, is_proc: bool): 
+    def if_escopo_While(self, temp, is_proc: bool): 
         self.indexToken += 1
         if self.token_atual().tipo == "token202_(":
             self.indexToken += 1
             tempExpression = []
-            tempExpression = self.expression_statement(tempExpression)
+            tempExpression = self.expression_escopo_main(tempExpression)
             temp.append(tempExpression)
         
             if self.token_atual().tipo == "token203_)":
@@ -1830,7 +1794,7 @@ class Parser:
                                 "Erro sintático: return declarado dentro de um procedimento na linha "
                                 + str(self.tokenAtual().linha)
                             ) 
-                        tempBlock.append(self.blockStatement(True, True))
+                        tempBlock.append(self.blockescopo_main(True, True))
             
                     temp.append(tempBlock)          
 
@@ -1844,7 +1808,7 @@ class Parser:
                             if self.token_atual().tipo == "token606_else":
                                 tempElse.append(self.indexEscopoAtual)
                                 tempElse.append(self.token_atual().tipo)
-                                tempElse = self.elsePartStatement(tempElse)     
+                                tempElse = self.else_escopo_while(tempElse)     
                                 
                                 temp.append(tempElse)
                                 self.tabelaDeSimbolos.append(temp)
@@ -1880,12 +1844,12 @@ class Parser:
                 str(self.token_atual().linha)
             )
 
-    def if_statement(self, temp, context=False):
+    def if_escopo_main(self, temp, context=False):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token202_(":
             self.indexDaTabelaDeTokens += 1
             tempExpression = []
-            tempExpression = self.expression_statement(tempExpression)
+            tempExpression = self.expression_escopo_main(tempExpression)
             temp.append(tempExpression)
 
             if self.token_atual().tipo == "token203_)":
@@ -1899,7 +1863,7 @@ class Parser:
                         self.token_atual().tipo != "token205_}"
                         and self.token_look_ahead().tipo != "token605_endif"
                     ):
-                        tempBlock.append(self.block3_statement(context=True))
+                        tempBlock.append(self.block_escopo_if(context=True))
 
                     temp.append(tempBlock)
                     if self.token_atual().tipo == "token205_}":
@@ -1912,7 +1876,7 @@ class Parser:
                             if self.token_atual().tipo == "token606_else":
                                 tempElse.append(self.indexEscopoAtual)
                                 tempElse.append(self.token_atual().tipo)
-                                tempElse = self.else_part_statement(
+                                tempElse = self.else_part_escopo_main(
                                     tempElse)  
 
                                 temp.append(tempElse)
@@ -1952,7 +1916,7 @@ class Parser:
             )
 
 
-    def else_part_statement(self, tempElse):
+    def else_part_escopo_main(self, tempElse):
         olhaAfrente = self.token_look_ahead()
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token204_{" and olhaAfrente.tipo != "token205_}":
@@ -1962,7 +1926,7 @@ class Parser:
                 self.token_atual().tipo != "token205_}"
                 and self.token_look_ahead().tipo != "token606_endelse"
             ):
-                tempBlock.append(self.block3_statement())
+                tempBlock.append(self.block_escopo_if())
             tempElse.append(tempBlock)
             if self.token_atual().tipo == "token205_}":
                 self.indexDaTabelaDeTokens += 1
@@ -1987,12 +1951,12 @@ class Parser:
             )
 
 
-    def if_statement2(self, temp, context=False):
+    def if_escopo_main_flow(self, temp, context=False):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token202_(":
             self.indexDaTabelaDeTokens += 1
             tempExpression = []
-            tempExpression = self.expression_statement(tempExpression)
+            tempExpression = self.expression_escopo_main(tempExpression)
             temp.append(tempExpression)
             if self.token_atual().tipo == "token203_)":
                 olhaAfrente = self.token_look_ahead()
@@ -2005,7 +1969,7 @@ class Parser:
                         self.token_atual().tipo != "token205_}"
                         and self.token_look_ahead().tipo != "token605_endif"
                     ):
-                        tempBlock.append(self.block2_statement())
+                        tempBlock.append(self.block_escopo_while())
                     temp.append(tempBlock)
                     if self.token_atual().tipo == "token205_}":
                         self.indexDaTabelaDeTokens += 1
@@ -2016,7 +1980,7 @@ class Parser:
                             if self.token_atual().tipo == "token606_else":
                                 tempElse.append(self.indexEscopoAtual)
                                 tempElse.append(self.token_atual().tipo)
-                                tempElse = self.else_part_statement2(
+                                tempElse = self.else_escopo_main_flow(
                                     tempElse)  
 
                                 temp.append(tempElse)
@@ -2056,7 +2020,7 @@ class Parser:
             )
 
 
-    def else_part_statement2(self, tempElse):
+    def else_escopo_main_flow(self, tempElse):
         olhaAfrente = self.token_look_ahead()
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token204_{" and olhaAfrente.tipo != "token205_}":
@@ -2066,7 +2030,7 @@ class Parser:
                 self.token_atual().tipo != "token205_}"
                 and self.token_look_ahead().tipo != "token606_endelse"
             ):
-                tempBlock.append(self.block2_statement())
+                tempBlock.append(self.block_escopo_while())
             tempElse.append(tempBlock)
             if self.token_atual().tipo == "token205_}":
                 self.indexDaTabelaDeTokens += 1
@@ -2091,12 +2055,12 @@ class Parser:
             )
 
 
-    def while_statement(self, temp):
+    def while_escopo_main(self, temp):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token202_(":
             self.indexDaTabelaDeTokens += 1
             tempExpression = []
-            tempExpression = self.expression_statement(tempExpression)
+            tempExpression = self.expression_escopo_main(tempExpression)
             temp.append(tempExpression)
             if self.token_atual().tipo == "token203_)":
                 self.indexDaTabelaDeTokens += 1
@@ -2108,7 +2072,7 @@ class Parser:
                         self.token_atual().tipo != "token205_}"
                         and self.token_look_ahead().tipo != "token607_endwhile"
                     ):
-                        tempBlock.append(self.block2_statement(context=True))
+                        tempBlock.append(self.block_escopo_while(context=True))
 
                     temp.append(tempBlock)
 
@@ -2146,7 +2110,7 @@ class Parser:
             )
 
 
-    def unconditional_branch_statement(self):
+    def statement_flow(self):
         if self.token_atual().tipo == "token614_cont":
             self.indexDaTabelaDeTokens += 1
             if self.token_atual().tipo == "token200_;":
@@ -2168,7 +2132,7 @@ class Parser:
                 )
 
 
-    def expression_statement(self, tempExpression):
+    def expression_escopo_main(self, tempExpression):
         if self.token_atual().tipo == "token500_Id" or self.token_atual().tipo == "token300_Num":
             tempExpression.append(self.token_atual().lexema)
             self.indexDaTabelaDeTokens += 1
@@ -2203,7 +2167,7 @@ class Parser:
             )
 
 
-    def call_op_statement(self, tempEndVar):
+    def call_op_escopo_main(self, tempEndVar):
         self.indexDaTabelaDeTokens += 1
         if self.token_atual().tipo == "token500_Id" or self.token_atual().tipo == "token300_Num":
             tempEndVar.append(self.token_atual().lexema)
@@ -2215,13 +2179,8 @@ class Parser:
                 or self.token_atual().tipo == "token104_/"
             ):
                 tempEndVar.append(self.token_atual().lexema)
-                self.call_op_statement(tempEndVar)
+                self.call_op_escopo_main(tempEndVar)
 
-                # expressaoTratada = arvoreExpressao(tempEndVar)
-
-                # var = expressaoTresEnderecos(expressaoTratada)
-
-                # self.tabelaDeTresEnderecos.extend(var)
             else:
                 return
         else:
@@ -2234,69 +2193,7 @@ class Parser:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    """
-
- Análise Semântica
-
-    """
-
-    # Não finalizado
+ #Análise Semântica
 
     def checkSemantica(self):
         for k in range(len(self.tabelaDeSimbolos)):

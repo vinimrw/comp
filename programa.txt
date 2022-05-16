@@ -1,10 +1,38 @@
 main {
 
-    int b = 10;
-    int a = 0;
-    bool d = True;
-    if(b == 10){
-        b = 1;
-        a = 2;
-    } endif
- } end
+    int i;
+    bool b;
+    i = 1;
+    b = True;
+    
+    func int f1(int t1, int t2){
+        return t1;
+    }endfunc
+
+    func bool f2(bool t1, bool t2){
+        return True;
+    }endfunc
+
+    proc p1(int t, int t2){
+        print(t1);
+    }endproc
+
+    int cont;
+    cont = 0;
+    while(cont < 10){
+        if(cont == 5){
+            break;
+        }endif
+        else{
+            continue;
+        }endelse
+    }endwhile
+
+    int teste1;
+    teste1 = call f1(2, 1);
+    call p1(2, 4);
+ } endmain
+
+
+
+ 

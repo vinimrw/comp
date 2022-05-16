@@ -156,15 +156,6 @@ class Scanner:
             else:  
                 return "token109_<"
 
-
-
-
-
-
-
-
-
-
     def scanReserved(self):
         for i in self.tokens:
             if i.tipo == "token500_Id":
@@ -172,12 +163,15 @@ class Scanner:
                 if i.lexema == "main":
                     i.tipo = "token600_main"
 
-                elif i.lexema == "end":
-                    i.tipo = "token601_end"
+                elif i.lexema == "endmain":
+                    i.tipo = "token601_endmain"
 
                 elif i.lexema == "func":
                     i.tipo = "token602_func"
-
+                
+                elif i.lexema == "endfunc":
+                    i.tipo = "token602_endfunc"
+                
                 elif i.lexema == "return":
                     i.tipo = "token603_return"
 
@@ -225,6 +219,9 @@ class Scanner:
 
                 elif i.lexema == "proc":
                     i.tipo = "token615_proc"
+
+                elif i.lexema == "endproc":
+                    i.tipo = "token615_endproc"
 
 
     def lookAhead(self):

@@ -1,12 +1,12 @@
 import traceback
 from lexer.lexica import Scanner
-from parser_compiler.parser import Parser
+from parser.parser import Parser
 from pprint import pprint
 
 import sys
 
 if __name__ == "__main__":
-    caminho = "teste1.txt"
+    caminho = "programa.txt"
 
     try:
         arquivo = open(caminho, "r")
@@ -22,17 +22,25 @@ if __name__ == "__main__":
 
     parser = Parser(tabelaDeTokens)
 
-    # print("\nTABELA DE TOKENS:\n")
-    # for i in tabelaDeTokens:
-    #     print(i)
-
+    print("#============================#\n")
+    print("#       TABELA DE TOKENS     #\n")
+    for i in tabelaDeTokens:
+        print(i)
+    print("#============================#\n")
+    
     try:
         parser.start()
-        # print("\nTABELA DE SÍMBOLOS:")
-        # pprint(parser.tabelaDeSimbolos)
+        print("#============================#\n")
+        print("#     TABELA DE SÍMBOLOS     #\n")
+        pprint(parser.tabelaDeSimbolos)
+        print("#============================#\n")
     except Exception as e:
         traceback.print_exc()
         print(e)
-
-else:
-    print("me executou como um módulo")
+    
+    print("#============================#\n")
+    print("#       CODIGO 3 END         #\n")
+    for i in parser.tabelaDeTresEnderecos:
+        print(i)    
+    print("#============================#\n")
+    print("\n           FIM...           \n")

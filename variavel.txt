@@ -1,6 +1,0 @@
-main{
-  int a = 1;
-  bool b = True;
-  bool f = False;
-  int d = 2;
-} end
